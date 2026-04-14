@@ -208,7 +208,7 @@ async function handleSubmit(event) {
 
         setFeedback("Agendamento registrado com sucesso. O horario escolhido foi removido da disponibilidade.", "success");
 
-        const whatsappNumber = "5511978751758";
+        const whatsappNumber = "5575981754628";
         const whatsappMessage = buildWhatsappMessage(formData);
         const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappMessage)}`;
         window.open(whatsappUrl, "_blank");
