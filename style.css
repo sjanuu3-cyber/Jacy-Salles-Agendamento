@@ -1,0 +1,231 @@
+      * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #f5e6d3 0%, #e8d4c1 100%);
+            color: #5d4037;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            padding: 40px 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            font-family: 'Brush Script MT', cursive;
+            font-size: 3.5em;
+            color: #8d6e63;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            color: #a1887f;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+
+        .butterfly {
+            font-size: 2em;
+            color: #bcaaa4;
+            margin: 10px 0;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            font-family: 'Brush Script MT', cursive;
+            font-size: 2.5em;
+            color: #8d6e63;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .price-section {
+            margin-bottom: 25px;
+        }
+
+        .price-section h3 {
+            font-family: 'Brush Script MT', cursive;
+            font-size: 1.8em;
+            color: #a1887f;
+            margin-bottom: 15px;
+        }
+
+        .price-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #efebe9;
+        }
+
+        .price-item:last-child {
+            border-bottom: none;
+        }
+
+        .service-name {
+            font-weight: bold;
+            color: #5d4037;
+        }
+
+        .price {
+            color: #8d6e63;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .booking-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        label {
+            font-weight: bold;
+            color: #5d4037;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #d7ccc8;
+            border-radius: 8px;
+            font-size: 1em;
+            font-family: 'Georgia', serif;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #8d6e63;
+        }
+
+        .service-selector {
+            display: grid;
+            gap: 10px;
+        }
+
+        .service-checkbox {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            background: #faf8f6;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .service-checkbox:hover {
+            background: #f0ebe8;
+        }
+
+        .service-checkbox input[type="checkbox"] {
+            width: auto;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+
+        button {
+            background: linear-gradient(135deg, #8d6e63 0%, #a1887f 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2em;
+            border-radius: 10px;
+            cursor: pointer;
+            font-family: 'Georgia', serif;
+            transition: transform 0.3s, box-shadow 0.3s;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(141, 110, 99, 0.4);
+        }
+
+        .total-price {
+            background: #faf8f6;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .total-price h3 {
+            color: #5d4037;
+            margin-bottom: 10px;
+        }
+
+        .total-amount {
+            font-size: 2em;
+            color: #8d6e63;
+            font-weight: bold;
+        }
+
+        .success-message {
+            display: none;
+            background: #c8e6c9;
+            color: #2e7d32;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            margin-top: 30px;
+        }
+
+        footer p {
+            color: #8d6e63;
+            margin: 5px 0;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 2.5em;
+            }
+
+            h2 {
+                font-size: 2em;
+            }
+        }

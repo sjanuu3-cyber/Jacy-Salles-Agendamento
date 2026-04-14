@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jacy Sallys - Nail Designer | Agendamento Online</title>
+    <link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Jacy Sallys</h1>
+            <div class="butterfly">🦋</div>
+            <p class="subtitle">Nail Designer</p>
+        </header>
+
+        <div class="main-content">
+            <!-- Tabela de Valores -->
+            <div class="card">
+                <h2>Tabela de Valores</h2>
+                
+                <div class="price-section">
+                    <h3>Unhas simples</h3>
+                    <div class="price-item">
+                        <span class="service-name">Pé</span>
+                        <span class="price">R$ 20,00</span>
+                    </div>
+                    <div class="price-item">
+                        <span class="service-name">Mão</span>
+                        <span class="price">R$ 25,00</span>
+                    </div>
+                    <div class="price-item">
+                        <span class="service-name">Pé e Mão</span>
+                        <span class="price">R$ 45,00</span>
+                    </div>
+                </div>
+
+                <div class="price-section">
+                    <h3>Alongamentos</h3>
+                    <div class="price-item">
+                        <span class="service-name">Postiça simples</span>
+                        <span class="price">R$ 75,00</span>
+                    </div>
+                    <div class="price-item">
+                        <span class="service-name">Postiças decorada</span>
+                        <span class="price">R$ 80,00</span>
+                    </div>
+                    <div class="price-item">
+                        <span class="service-name">Blindagem</span>
+                        <span class="price">R$ 75,00</span>
+                    </div>
+                </div>
+
+                <div class="price-section">
+                    <h3>Extras</h3>
+                    <div class="price-item">
+                        <span class="service-name">Esmaltação em gel</span>
+                        <span class="price">R$ 30,00</span>
+                    </div>
+                    <div class="price-item">
+                        <span class="service-name">Manutenção</span>
+                        <span class="price">R$ 70,00</span>
+                    </div>
+                    <div class="price-item">
+                        <span class="service-name">Remoção</span>
+                        <span class="price">R$ 30,00</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Formulário de Agendamento -->
+            <div class="card">
+                <h2>Agendar Horário</h2>
+                
+                <form class="booking-form" id="bookingForm">
+                    <div>
+                        <label for="name">Nome Completo</label>
+                        <input type="text" id="name" required placeholder="Digite seu nome">
+                    </div>
+
+                    <div>
+                        <label for="phone">Telefone / WhatsApp</label>
+                        <input type="tel" id="phone" required placeholder="(00) 00000-0000">
+                    </div>
+
+                    <div>
+                        <label for="date">Data</label>
+                        <input type="date" id="date" required>
+                    </div>
+
+                    <div>
+                        <label for="time">Horário</label>
+                        <select id="time" required>
+                            <option value="">Selecione um horário</option>
+                            <option value="09:00">09:00</option>
+                            <option value="10:00">10:00</option>
+                            <option value="11:00">11:00</option>
+                            <option value="13:00">13:00</option>
+                            <option value="14:00">14:00</option>
+                            <option value="15:00">15:00</option>
+                            <option value="16:00">16:00</option>
+                            <option value="17:00">17:00</option>
+                            <option value="18:00">18:00</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label>Selecione os serviços:</label>
+                        <div class="service-selector" id="serviceSelector">
+                            <label class="service-checkbox">
+                                <input type="checkbox" name="service" value="20" data-name="Pé">
+                                <span>Pé - R$ 20,00</span>
+                            </label>
+                            <label class="service-checkbox">
+                                <input type="checkbox" name="service" value="25" data-name="Mão">
+                                <span>Mão - R$ 25,00</span>
+                            </label>
+                            <label class="service-checkbox">
+                                <input type="checkbox" name="service" value="45" data-name="Pé e Mão">
+                                <span>Pé e Mão - R$ 45,00</span>
+                            </label>
+                            <label class="service-checkbox">
+                                <input type="checkbox" name="service" value="75" data-name="Postiça simples">
+                                <span>Postiça simples - R$ 75,00</span>
+                            </label>
+                            <label class="service-checkbox">
+                                <input type="checkbox" name="service" value="80" data-name="Postiças decorada">
+                                <span>Postiças decorada - R$ 80,00</span>
+                            </label>
+                            <label class="service-checkbox">
+                                <input type="checkbox" name="service" value="75" data-name="Blindagem">
+                                <span>Blindagem - R$ 75,00</span>
+                            </label>
+                            <label class="service-checkbox">
+                                <input type="checkbox" name="service" value="30" data-name="Esmaltação em gel">
+                                <span>Esmaltação em gel - R$ 30,00</span>
+                            </label>
+                            <label class="service-checkbox">
+                                <input type="checkbox" name="service" value="70" data-name="Manutenção">
+                                <span>Manutenção - R$ 70,00</span>
+                            </label>
+                            <label class="service-checkbox">
+                                <input type="checkbox" name="service" value="30" data-name="Remoção">
+                                <span>Remoção - R$ 30,00</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="total-price">
+                        <h3>Total do Agendamento</h3>
+                        <div class="total-amount" id="totalAmount">R$ 0,00</div>
+                    </div>
+
+                    <div>
+                        <label for="notes">Observações (opcional)</label>
+                        <textarea id="notes" rows="3" placeholder="Alguma preferência ou observação?"></textarea>
+                    </div>
+
+                    <button type="submit">Confirmar Agendamento 💅</button>
+                </form>
+
+                <div class="success-message" id="successMessage">
+                    ✅ Agendamento realizado com sucesso! Em breve você receberá uma confirmação.
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <div class="butterfly">🦋 ♥️ 🦋</div>
+            <p><strong>Jacy Sallys - Nail Designer</strong></p>
+            <p>Beleza e cuidado para suas unhas</p>
+            <p style="margin-top: 15px; font-size: 0.9em;">📍 Entre em contato para mais informações</p>
+        </footer>
+    </div>
+
+    <script>
+        // Definir data mínima como hoje
+        const dateInput = document.getElementById('date');
+        const today = new Date().toISOString().split('T')[0];
+        dateInput.min = today;
+
+        // Calcular total
+        const checkboxes = document.querySelectorAll('input[name="service"]');
+        const totalAmount = document.getElementById('totalAmount');
+
+        function updateTotal() {
+            let total = 0;
+            checkboxes.forEach(checkbox => {
+                if (checkbox.checked) {
+                    total += parseFloat(checkbox.value);
+                }
+            });
+            totalAmount.textContent = `R$ ${total.toFixed(2).replace('.', ',')}`;
+        }
+
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', updateTotal);
+        });
+
+        // Formulário
+        document.getElementById('bookingForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('name').value;
+            const phone = document.getElementById('phone').value;
+            const date = document.getElementById('date').value;
+            const time = document.getElementById('time').value;
+            const notes = document.getElementById('notes').value;
+            
+            // Pegar serviços selecionados
+            const selectedServices = [];
+            checkboxes.forEach(checkbox => {
+                if (checkbox.checked) {
+                    selectedServices.push(checkbox.dataset.name);
+                }
+            });
+
+            if (selectedServices.length === 0) {
+                alert('Por favor, selecione pelo menos um serviço!');
+                return;
+            }
+
+            // Formatar data
+            const dateObj = new Date(date + 'T00:00:00');
+            const formattedDate = dateObj.toLocaleDateString('pt-BR');
+
+            // Criar mensagem para WhatsApp
+            const total = totalAmount.textContent;
+            let message = `🦋 *Novo Agendamento - Jacy Sallys* 🦋\n\n`;
+            message += `👤 *Nome:* ${name}\n`;
+            message += `📅 *Data:* ${formattedDate}\n`;
+            message += `🕐 *Horário:* ${time}\n\n`;
+            message += `💅 *Serviços:*\n`;
+            selectedServices.forEach(service => {
+                message += `  • ${service}\n`;
+            });
+            message += `\n💰 *Total:* ${total}`;
+            
+            if (notes) {
+                message += `\n\n📝 *Observações:* ${notes}`;
+            }
+
+            // Mostrar mensagem de sucesso
+            document.getElementById('successMessage').style.display = 'block';
+            
+            // Abrir WhatsApp (substitua pelo número real)
+            const whatsappNumber = '5511943132035'; // COLOQUE O NÚMERO REAL AQUI
+            const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+            
+            setTimeout(() => {
+                window.open(whatsappUrl, '_blank');
+            }, 1500);
+
+            // Limpar formulário após 3 segundos
+            setTimeout(() => {
+                this.reset();
+                updateTotal();
+                document.getElementById('successMessage').style.display = 'none';
+            }, 3000);
+        });
+    </script>
+</body>
+</html>
