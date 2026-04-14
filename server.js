@@ -130,6 +130,26 @@ function getAvailability(dateValue, bookingsData = readBookingsFile()) {
     };
 }
 
+function getBookingsByDate(dateValue, bookingsData = readBookingsFile()) {
+    const parsedDate = parseDateInput(dateValue);
+
+    if (!parsedDate) {
+        throw new Error("Data invalida.");
+    }
+
+    const weekday = parsedDate.getDay();
+    const bookings = bookingsData.bookings
+        .filter((booking) => booking.date === dateValue)
+        .sort((first, second) => first.time.localeCompare(second.time));
+
+    return {
+        date: dateValue,
+        weekday,
+        weekdayLabel: WEEKDAY_LABELS[weekday],
+        bookings
+    };
+}
+
 function validateServices(services) {
     return Array.isArray(services) && services.length > 0 && services.every((service) => {
         return service && typeof service.name === "string" && Number.isFinite(service.price);
@@ -250,6 +270,23 @@ async function handleApi(request, response, urlObject) {
         return;
     }
 
+    if (request.method === "GET" && urlObject.pathname === "/api/bookings") {
+        const dateValue = urlObject.searchParams.get("date");
+
+        if (!dateValue) {
+            sendJson(response, 400, { error: "Informe a data no formato YYYY-MM-DD." });
+            return;
+        }
+
+        try {
+            sendJson(response, 200, getBookingsByDate(dateValue));
+        } catch (error) {
+            sendJson(response, 400, { error: error.message });
+        }
+
+        return;
+    }
+
     if (request.method === "POST" && urlObject.pathname === "/api/bookings") {
         try {
             const payload = await readRequestBody(request);
@@ -301,6 +338,27 @@ async function handleApi(request, response, urlObject) {
         return;
     }
 
+    if (request.method === "DELETE" && urlObject.pathname.startsWith("/api/bookings/")) {
+        const bookingId = decodeURIComponent(urlObject.pathname.replace("/api/bookings/", ""));
+        const bookingsData = readBookingsFile();
+        const bookingIndex = bookingsData.bookings.findIndex((booking) => booking.id === bookingId);
+
+        if (bookingIndex === -1) {
+            sendJson(response, 404, { error: "Agendamento nao encontrado." });
+            return;
+        }
+
+        const [removedBooking] = bookingsData.bookings.splice(bookingIndex, 1);
+        writeBookingsFile(bookingsData);
+
+        sendJson(response, 200, {
+            message: "Horario liberado com sucesso.",
+            booking: removedBooking,
+            availability: getAvailability(removedBooking.date, bookingsData)
+        });
+        return;
+    }
+
     sendJson(response, 404, { error: "Rota da API nao encontrada." });
 }
 
@@ -338,5 +396,6 @@ module.exports = {
     PORT,
     WEEKLY_SCHEDULE,
     createServer,
-    getAvailability
+    getAvailability,
+    getBookingsByDate
 };

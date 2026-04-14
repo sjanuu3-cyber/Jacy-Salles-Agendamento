@@ -300,6 +300,74 @@ button:hover:not(:disabled) {
     color: #8a6731;
 }
 
+.manager-panel {
+    margin-top: 26px;
+    padding-top: 22px;
+    border-top: 1px solid #f0ddd2;
+}
+
+.manager-panel h3 {
+    color: #a46759;
+    margin-bottom: 10px;
+}
+
+.manager-copy {
+    color: #8d6a60;
+    line-height: 1.5;
+    margin-bottom: 14px;
+}
+
+.manager-controls {
+    margin-bottom: 12px;
+}
+
+.booking-list {
+    display: grid;
+    gap: 12px;
+    margin-top: 14px;
+}
+
+.booking-item {
+    border: 1px solid #f0ddd2;
+    border-radius: 14px;
+    background: #fffaf7;
+    padding: 16px;
+}
+
+.booking-item-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.booking-time {
+    color: #8b5a4a;
+    font-size: 1.05rem;
+}
+
+.booking-name {
+    font-weight: 700;
+    color: #5f3f37;
+    margin-bottom: 4px;
+}
+
+.booking-meta,
+.booking-services,
+.booking-notes {
+    color: #8d6a60;
+    line-height: 1.5;
+    font-size: 0.95rem;
+}
+
+.release-button {
+    width: auto;
+    padding: 10px 16px;
+    font-size: 0.95rem;
+    border-radius: 12px;
+}
+
 footer {
     text-align: center;
     border-radius: 20px;
@@ -341,5 +409,14 @@ footer p + p {
 
     .schedule-grid {
         grid-template-columns: 1fr;
+    }
+
+    .booking-item-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .release-button {
+        width: 100%;
     }
 }
