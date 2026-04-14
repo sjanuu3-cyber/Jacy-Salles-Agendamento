@@ -41,6 +41,12 @@
             text-transform: uppercase;
         }
 
+        .tagline {
+            margin-top: 12px;
+            color: #8d6e63;
+            font-size: 1em;
+        }
+
         .butterfly {
             font-size: 2em;
             color: #bcaaa4;
@@ -102,6 +108,60 @@
             font-size: 1.1em;
         }
 
+        .schedule-board {
+            background: #faf8f6;
+            border: 1px solid #efebe9;
+            border-radius: 14px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .schedule-board h3 {
+            color: #8d6e63;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+
+        .schedule-copy {
+            color: #8d6e63;
+            text-align: center;
+            line-height: 1.5;
+        }
+
+        .schedule-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+            margin-top: 18px;
+        }
+
+        .day-card {
+            background: white;
+            border: 1px solid #efebe9;
+            border-radius: 12px;
+            padding: 15px;
+        }
+
+        .day-card h4 {
+            color: #8d6e63;
+            margin-bottom: 10px;
+        }
+
+        .time-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .time-pill {
+            background: #f2dfd7;
+            color: #a05f6c;
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-size: 0.95em;
+            font-weight: bold;
+        }
+
         .booking-form {
             display: flex;
             flex-direction: column;
@@ -128,6 +188,19 @@
         input:focus, select:focus, textarea:focus {
             outline: none;
             border-color: #8d6e63;
+        }
+
+        select:disabled {
+            background: #f3efec;
+            color: #8d6e63;
+            cursor: not-allowed;
+        }
+
+        .field-hint {
+            margin-top: 8px;
+            color: #8d6e63;
+            font-size: 0.92em;
+            line-height: 1.4;
         }
 
         .service-selector {
@@ -218,6 +291,10 @@
 
         @media (max-width: 768px) {
             .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            .schedule-grid {
                 grid-template-columns: 1fr;
             }
 

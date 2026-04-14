@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jacy Sallys - Nail Designer | Agendamento Online</title>
+    <title>Jacy Sallys | Agendamento Online</title>
     <link rel="stylesheet" href="style.css">
 
 </head>
@@ -13,6 +13,7 @@
             <h1>Jacy Sallys</h1>
             <div class="butterfly">🦋</div>
             <p class="subtitle">Nail Designer</p>
+            <p class="tagline">Cuidado, beleza e praticidade no seu agendamento.</p>
         </header>
 
         <div class="main-content">
@@ -73,6 +74,92 @@
             <div class="card">
                 <h2>Agendar Horário</h2>
                 
+                <div class="schedule-board">
+                    <h3>Horarios disponiveis</h3>
+                    <p class="schedule-copy">Os horarios do formulario seguem exatamente esta grade semanal.</p>
+
+                    <div class="schedule-grid">
+                        <article class="day-card">
+                            <h4>Segunda-feira</h4>
+                            <div class="time-list">
+                                <span class="time-pill">14:00</span>
+                                <span class="time-pill">15:30</span>
+                                <span class="time-pill">16:00</span>
+                                <span class="time-pill">17:30</span>
+                            </div>
+                        </article>
+
+                        <article class="day-card">
+                            <h4>Ter&ccedil;a-feira</h4>
+                            <div class="time-list">
+                                <span class="time-pill">08:00</span>
+                                <span class="time-pill">09:30</span>
+                                <span class="time-pill">10:00</span>
+                                <span class="time-pill">11:30</span>
+                                <span class="time-pill">14:00</span>
+                                <span class="time-pill">15:30</span>
+                                <span class="time-pill">16:00</span>
+                                <span class="time-pill">17:30</span>
+                            </div>
+                        </article>
+
+                        <article class="day-card">
+                            <h4>Quarta-feira</h4>
+                            <div class="time-list">
+                                <span class="time-pill">08:00</span>
+                                <span class="time-pill">09:30</span>
+                                <span class="time-pill">10:00</span>
+                                <span class="time-pill">11:30</span>
+                                <span class="time-pill">14:00</span>
+                                <span class="time-pill">15:30</span>
+                                <span class="time-pill">16:00</span>
+                                <span class="time-pill">17:30</span>
+                            </div>
+                        </article>
+
+                        <article class="day-card">
+                            <h4>Quinta-feira</h4>
+                            <div class="time-list">
+                                <span class="time-pill">08:00</span>
+                                <span class="time-pill">09:30</span>
+                                <span class="time-pill">10:00</span>
+                                <span class="time-pill">11:30</span>
+                                <span class="time-pill">14:00</span>
+                                <span class="time-pill">15:30</span>
+                                <span class="time-pill">16:00</span>
+                                <span class="time-pill">17:30</span>
+                            </div>
+                        </article>
+
+                        <article class="day-card">
+                            <h4>Sexta-feira</h4>
+                            <div class="time-list">
+                                <span class="time-pill">08:00</span>
+                                <span class="time-pill">09:30</span>
+                                <span class="time-pill">10:00</span>
+                                <span class="time-pill">11:30</span>
+                                <span class="time-pill">14:00</span>
+                                <span class="time-pill">15:30</span>
+                                <span class="time-pill">16:00</span>
+                                <span class="time-pill">17:30</span>
+                            </div>
+                        </article>
+
+                        <article class="day-card">
+                            <h4>S&aacute;bado</h4>
+                            <div class="time-list">
+                                <span class="time-pill">08:00</span>
+                                <span class="time-pill">09:30</span>
+                                <span class="time-pill">10:00</span>
+                                <span class="time-pill">11:30</span>
+                                <span class="time-pill">12:30</span>
+                                <span class="time-pill">14:00</span>
+                                <span class="time-pill">15:30</span>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+
                 <form class="booking-form" id="bookingForm">
                     <div>
                         <label for="name">Nome Completo</label>
@@ -91,18 +178,10 @@
 
                     <div>
                         <label for="time">Horário</label>
-                        <select id="time" required>
+                        <select id="time" required disabled>
                             <option value="">Selecione um horário</option>
-                            <option value="09:00">09:00</option>
-                            <option value="10:00">10:00</option>
-                            <option value="11:00">11:00</option>
-                            <option value="13:00">13:00</option>
-                            <option value="14:00">14:00</option>
-                            <option value="15:00">15:00</option>
-                            <option value="16:00">16:00</option>
-                            <option value="17:00">17:00</option>
-                            <option value="18:00">18:00</option>
                         </select>
+                        <p class="field-hint" id="availabilityMessage">Escolha uma data para ver os horarios disponiveis.</p>
                     </div>
 
                     <div>
@@ -259,6 +338,228 @@
                 document.getElementById('successMessage').style.display = 'none';
             }, 3000);
         });
+    </script>
+    <script>
+        (function () {
+            const weeklySchedule = {
+                0: [],
+                1: ['14:00', '15:30', '16:00', '17:30'],
+                2: ['08:00', '09:30', '10:00', '11:30', '14:00', '15:30', '16:00', '17:30'],
+                3: ['08:00', '09:30', '10:00', '11:30', '14:00', '15:30', '16:00', '17:30'],
+                4: ['08:00', '09:30', '10:00', '11:30', '14:00', '15:30', '16:00', '17:30'],
+                5: ['08:00', '09:30', '10:00', '11:30', '14:00', '15:30', '16:00', '17:30'],
+                6: ['08:00', '09:30', '10:00', '11:30', '12:30', '14:00', '15:30']
+            };
+
+            const weekdayNames = {
+                0: 'Domingo',
+                1: 'Segunda-feira',
+                2: 'Terca-feira',
+                3: 'Quarta-feira',
+                4: 'Quinta-feira',
+                5: 'Sexta-feira',
+                6: 'Sabado'
+            };
+
+            const storageKey = 'jacy-sallys-bookings';
+            const bookingForm = document.getElementById('bookingForm');
+            const dateInput = document.getElementById('date');
+            const timeSelect = document.getElementById('time');
+            const availabilityMessage = document.getElementById('availabilityMessage');
+            const totalAmount = document.getElementById('totalAmount');
+            const successMessage = document.getElementById('successMessage');
+            const serviceCheckboxes = document.querySelectorAll('input[name="service"]');
+
+            function getTodayAsInputValue() {
+                const today = new Date();
+                const year = today.getFullYear();
+                const month = String(today.getMonth() + 1).padStart(2, '0');
+                const day = String(today.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            }
+
+            function parseInputDate(value) {
+                const [year, month, day] = value.split('-').map(Number);
+                return new Date(year, month - 1, day);
+            }
+
+            function formatDate(value) {
+                return parseInputDate(value).toLocaleDateString('pt-BR');
+            }
+
+            function loadBookings() {
+                try {
+                    return JSON.parse(localStorage.getItem(storageKey)) || {};
+                } catch (error) {
+                    return {};
+                }
+            }
+
+            function saveBookings(bookings) {
+                localStorage.setItem(storageKey, JSON.stringify(bookings));
+            }
+
+            function getBookedTimes(dateValue) {
+                const bookings = loadBookings();
+                return bookings[dateValue] || [];
+            }
+
+            function reserveTime(dateValue, timeValue) {
+                const bookings = loadBookings();
+                const dayBookings = bookings[dateValue] || [];
+
+                if (!dayBookings.includes(timeValue)) {
+                    dayBookings.push(timeValue);
+                    dayBookings.sort((firstTime, secondTime) => firstTime.localeCompare(secondTime));
+                    bookings[dateValue] = dayBookings;
+                    saveBookings(bookings);
+                }
+            }
+
+            function updateTotalValue() {
+                let total = 0;
+
+                serviceCheckboxes.forEach((checkbox) => {
+                    if (checkbox.checked) {
+                        total += Number(checkbox.value);
+                    }
+                });
+
+                totalAmount.textContent = `R$ ${total.toFixed(2).replace('.', ',')}`;
+            }
+
+            function renderTimeOptions() {
+                const selectedDate = dateInput.value;
+                timeSelect.innerHTML = '';
+
+                const defaultOption = document.createElement('option');
+                defaultOption.value = '';
+
+                if (!selectedDate) {
+                    defaultOption.textContent = 'Escolha primeiro uma data';
+                    timeSelect.appendChild(defaultOption);
+                    timeSelect.disabled = true;
+                    availabilityMessage.textContent = 'Escolha uma data para ver os horarios disponiveis.';
+                    return;
+                }
+
+                const weekday = parseInputDate(selectedDate).getDay();
+                const daySchedule = weeklySchedule[weekday] || [];
+                const bookedTimes = getBookedTimes(selectedDate);
+                const availableTimes = daySchedule.filter((timeValue) => !bookedTimes.includes(timeValue));
+
+                if (daySchedule.length === 0) {
+                    defaultOption.textContent = 'Nao ha atendimento neste dia';
+                    timeSelect.appendChild(defaultOption);
+                    timeSelect.disabled = true;
+                    availabilityMessage.textContent = `${weekdayNames[weekday]} nao possui horarios de atendimento.`;
+                    return;
+                }
+
+                if (availableTimes.length === 0) {
+                    defaultOption.textContent = 'Sem horarios disponiveis';
+                    timeSelect.appendChild(defaultOption);
+                    timeSelect.disabled = true;
+                    availabilityMessage.textContent = `Todos os horarios de ${weekdayNames[weekday]} em ${formatDate(selectedDate)} ja foram reservados.`;
+                    return;
+                }
+
+                defaultOption.textContent = 'Selecione um horario';
+                timeSelect.appendChild(defaultOption);
+
+                availableTimes.forEach((timeValue) => {
+                    const option = document.createElement('option');
+                    option.value = timeValue;
+                    option.textContent = timeValue;
+                    timeSelect.appendChild(option);
+                });
+
+                timeSelect.disabled = false;
+                availabilityMessage.textContent = `${weekdayNames[weekday]} com ${availableTimes.length} horario(s) disponivel(is).`;
+            }
+
+            dateInput.min = getTodayAsInputValue();
+
+            serviceCheckboxes.forEach((checkbox) => {
+                checkbox.addEventListener('change', updateTotalValue);
+            });
+
+            dateInput.addEventListener('change', renderTimeOptions);
+            window.addEventListener('storage', renderTimeOptions);
+
+            bookingForm.addEventListener('submit', (event) => {
+                event.preventDefault();
+                event.stopImmediatePropagation();
+
+                const name = document.getElementById('name').value.trim();
+                const phone = document.getElementById('phone').value.trim();
+                const dateValue = dateInput.value;
+                const timeValue = timeSelect.value;
+                const notes = document.getElementById('notes').value.trim();
+                const selectedServices = [];
+
+                serviceCheckboxes.forEach((checkbox) => {
+                    if (checkbox.checked) {
+                        selectedServices.push(checkbox.dataset.name);
+                    }
+                });
+
+                if (!dateValue || !timeValue) {
+                    alert('Escolha uma data e um horario disponivel para continuar.');
+                    return;
+                }
+
+                if (selectedServices.length === 0) {
+                    alert('Selecione pelo menos um servico.');
+                    return;
+                }
+
+                if (getBookedTimes(dateValue).includes(timeValue)) {
+                    alert('Esse horario acabou de ser reservado. Escolha outro horario disponivel.');
+                    renderTimeOptions();
+                    return;
+                }
+
+                reserveTime(dateValue, timeValue);
+                renderTimeOptions();
+
+                const formattedDate = formatDate(dateValue);
+                const total = totalAmount.textContent;
+                let message = '*Novo agendamento - Jacy Sallys*\n\n';
+                message += `*Nome:* ${name}\n`;
+                message += `*Telefone:* ${phone}\n`;
+                message += `*Data:* ${formattedDate}\n`;
+                message += `*Horario:* ${timeValue}\n\n`;
+                message += '*Servicos:*\n';
+
+                selectedServices.forEach((serviceName) => {
+                    message += `- ${serviceName}\n`;
+                });
+
+                message += `\n*Total:* ${total}`;
+
+                if (notes) {
+                    message += `\n\n*Observacoes:* ${notes}`;
+                }
+
+                successMessage.textContent = 'Agendamento registrado com sucesso. O horario escolhido foi removido da lista de disponibilidade.';
+                successMessage.style.display = 'block';
+
+                const whatsappNumber = '5575981754628';
+                const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+                window.open(whatsappUrl, '_blank');
+
+                setTimeout(() => {
+                    bookingForm.reset();
+                    updateTotalValue();
+                    renderTimeOptions();
+                    successMessage.style.display = 'none';
+                }, 3000);
+            }, true);
+
+            updateTotalValue();
+            renderTimeOptions();
+        }());
     </script>
 </body>
 </html>
