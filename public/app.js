@@ -1,399 +1,480 @@
-const bookingForm = document.getElementById("bookingForm");
+﻿const bookingForm = document.getElementById("bookingForm");
 const dateInput = document.getElementById("date");
 const timeSelect = document.getElementById("time");
 const availabilityMessage = document.getElementById("availabilityMessage");
-const feedbackMessage = document.getElementById("feedbackMessage");
-const manageDateInput = document.getElementById("manageDate");
+const bookingFeedback = document.getElementById("bookingFeedback");
+const totalAmount = document.getElementById("totalAmount");
+const notesInput = document.getElementById("notes");
+const serviceCheckboxes = document.querySelectorAll('input[name="service"]');
+
+const loginBox = document.getElementById("loginBox");
+const loginForm = document.getElementById("loginForm");
+const authMessage = document.getElementById("authMessage");
+const logoutButton = document.getElementById("logoutButton");
+const managerPanel = document.getElementById("managerPanel");
+const manageDate = document.getElementById("manageDate");
 const manageMessage = document.getElementById("manageMessage");
 const bookingList = document.getElementById("bookingList");
-const totalAmount = document.getElementById("totalAmount");
-const submitButton = document.getElementById("submitButton");
-const serviceCheckboxes = Array.from(document.querySelectorAll('input[name="service"]'));
 
-function getTodayAsInputValue() {
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, "0");
-    const day = String(today.getDate()).padStart(2, "0");
-    return `${year}-${month}-${day}`;
+const STATUS_LABELS = {
+    pending: "Agendado",
+    completed: "Finalizado",
+    cancelled: "Cancelado"
+};
+
+const WHATSAPP_NUMBER = "5575981754628";
+
+let adminAuthenticated = false;
+
+function escapeHTML(value) {
+    return String(value ?? "").replace(/[&<>"']/g, character => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+    })[character]);
 }
 
-function parseInputDate(value) {
-    const [year, month, day] = value.split("-").map(Number);
-    return new Date(year, month - 1, day);
+function formatCurrencyBRL(value) {
+    return `R$ ${Number(value || 0).toFixed(2).replace(".", ",")}`;
 }
 
-function formatDate(value) {
-    return parseInputDate(value).toLocaleDateString("pt-BR");
+function formatDateBR(dateValue) {
+    if (!dateValue) {
+        return "";
+    }
+
+    const [year, month, day] = dateValue.split("-");
+
+    if (!year || !month || !day) {
+        return dateValue;
+    }
+
+    return `${day}/${month}/${year}`;
 }
 
-function setFeedback(message, type) {
-    feedbackMessage.hidden = false;
-    feedbackMessage.textContent = message;
-    feedbackMessage.className = `feedback feedback-${type}`;
+function setTimePlaceholder(message) {
+    timeSelect.innerHTML = `<option value="">${escapeHTML(message)}</option>`;
+    timeSelect.disabled = true;
 }
 
-function clearFeedback() {
-    feedbackMessage.hidden = true;
-    feedbackMessage.textContent = "";
-    feedbackMessage.className = "feedback";
+function showBookingFeedback(message, isError = false) {
+    bookingFeedback.hidden = !message;
+    bookingFeedback.textContent = message;
+    bookingFeedback.classList.toggle("error", Boolean(message) && isError);
+    bookingFeedback.classList.toggle("success", Boolean(message) && !isError);
 }
 
 function updateTotal() {
-    let total = 0;
+    const total = [...serviceCheckboxes].reduce((sum, checkbox) => {
+        return checkbox.checked ? sum + Number(checkbox.value) : sum;
+    }, 0);
 
-    serviceCheckboxes.forEach((checkbox) => {
-        if (checkbox.checked) {
-            total += Number(checkbox.value);
-        }
-    });
-
-    totalAmount.textContent = `R$ ${total.toFixed(2).replace(".", ",")}`;
+    totalAmount.textContent = formatCurrencyBRL(total);
 }
 
-function resetTimeSelect(message) {
-    timeSelect.innerHTML = '<option value="">Escolha primeiro uma data</option>';
-    timeSelect.disabled = true;
-    availabilityMessage.textContent = message;
-}
+function buildWhatsAppMessage(body) {
+    const servicesText = body.services.map(service => `* ${service.name}`).join("\n");
 
-function buildWhatsappMessage(formData) {
-    let message = "🦋 *Novo agendamento - Jacy Sallys* 🦋\n\n";
-    message += `👤 *Nome:* ${formData.name}\n`;
-    message += `📱 *Telefone:* ${formData.phone}\n`;
-    message += `📅 *Data:* ${formatDate(formData.date)}\n`;
-    message += `🕐 *Horario:* ${formData.time}\n\n`;
-    message += "💅 *Servicos:*\n";
+    let message = `🦋 *Novo agendamento - Jacy Sallys* 🦋
 
-    formData.services.forEach((service) => {
-        message += `• ${service.name}\n`;
-    });
+👤 Nome: ${body.name}
+📱 Telefone: ${body.phone}
+📅 Data: ${formatDateBR(body.date)}
+🕐 Horario: ${body.time}
 
-    message += `\n💰 *Total:* ${formData.total}`;
+💅 Servicos:
+${servicesText}
 
-    if (formData.notes) {
-        message += `\n\n📝 *Observacoes:* ${formData.notes}`;
+💰 Total: ${body.total}`;
+
+    if (body.notes) {
+        message += `\n\n📝 Observacoes:\n${body.notes}`;
     }
 
     return message;
 }
 
-async function fetchAvailability(dateValue) {
-    const response = await fetch(`/api/availability?date=${encodeURIComponent(dateValue)}`, {
-        headers: {
-            Accept: "application/json"
+function setAdminState(authenticated) {
+    adminAuthenticated = authenticated;
+    loginBox.hidden = authenticated;
+    managerPanel.hidden = !authenticated;
+    logoutButton.hidden = !authenticated;
+
+    if (!authenticated) {
+        bookingList.innerHTML = "";
+        manageMessage.textContent = "Entre para visualizar os agendamentos.";
+        return;
+    }
+
+    authMessage.textContent = "";
+
+    if (!manageDate.value && dateInput.value) {
+        manageDate.value = dateInput.value;
+    }
+
+    manageMessage.textContent = manageDate.value
+        ? "Selecione uma data para atualizar a lista de agendamentos."
+        : "Escolha uma data para carregar os agendamentos.";
+}
+
+function handleSessionExpired() {
+    setAdminState(false);
+    authMessage.textContent = "Sua sessao expirou. Entre novamente.";
+}
+
+async function checkAdminSession() {
+    try {
+        const response = await fetch("/api/admin/session");
+        const data = await response.json();
+
+        setAdminState(Boolean(data.authenticated));
+
+        if (data.authenticated && manageDate.value) {
+            await loadBookings();
         }
-    });
-    const payload = await response.json();
-
-    if (!response.ok) {
-        throw new Error(payload.error || "Nao foi possivel consultar a disponibilidade.");
+    } catch {
+        setAdminState(false);
+        authMessage.textContent = "Nao foi possivel verificar o login do admin.";
     }
-
-    return payload;
 }
 
-async function fetchBookings(dateValue) {
-    const response = await fetch(`/api/bookings?date=${encodeURIComponent(dateValue)}`, {
-        headers: {
-            Accept: "application/json"
-        }
-    });
-    const payload = await response.json();
-
-    if (!response.ok) {
-        throw new Error(payload.error || "Nao foi possivel carregar os agendamentos.");
-    }
-
-    return payload;
-}
-
-function renderAvailability(payload) {
-    timeSelect.innerHTML = "";
-
-    if (!payload.date) {
-        resetTimeSelect("Escolha uma data para consultar os horarios disponiveis.");
+async function loadAvailability(date) {
+    if (!date) {
+        setTimePlaceholder("Escolha primeiro uma data");
+        availabilityMessage.textContent = "Escolha uma data para ver os horarios disponiveis.";
         return;
     }
 
-    const defaultOption = document.createElement("option");
-    defaultOption.value = "";
-
-    if (payload.schedule.length === 0) {
-        defaultOption.textContent = "Nao ha atendimento neste dia";
-        timeSelect.appendChild(defaultOption);
-        timeSelect.disabled = true;
-        availabilityMessage.textContent = `${payload.weekdayLabel} nao possui horarios de atendimento.`;
-        return;
-    }
-
-    if (payload.available.length === 0) {
-        defaultOption.textContent = "Sem horarios disponiveis";
-        timeSelect.appendChild(defaultOption);
-        timeSelect.disabled = true;
-        availabilityMessage.textContent = `Todos os horarios de ${payload.weekdayLabel} em ${formatDate(payload.date)} ja foram reservados.`;
-        return;
-    }
-
-    defaultOption.textContent = "Selecione um horario";
-    timeSelect.appendChild(defaultOption);
-
-    payload.available.forEach((timeValue) => {
-        const option = document.createElement("option");
-        option.value = timeValue;
-        option.textContent = timeValue;
-        timeSelect.appendChild(option);
-    });
-
-    timeSelect.disabled = false;
-    availabilityMessage.textContent = `${payload.weekdayLabel} com ${payload.available.length} horario(s) disponivel(is).`;
-}
-
-async function loadAvailability(dateValue) {
-    if (!dateValue) {
-        resetTimeSelect("Escolha uma data para consultar os horarios disponiveis.");
-        return;
-    }
-
-    resetTimeSelect("Consultando disponibilidade...");
+    availabilityMessage.textContent = "Carregando horarios...";
 
     try {
-        const payload = await fetchAvailability(dateValue);
-        renderAvailability(payload);
-    } catch (error) {
-        resetTimeSelect("Nao foi possivel carregar os horarios agora.");
-        setFeedback(error.message, "error");
-    }
-}
-
-function clearBookingList() {
-    bookingList.replaceChildren();
-}
-
-function renderEmptyBookings(message) {
-    clearBookingList();
-
-    const emptyState = document.createElement("div");
-    emptyState.className = "booking-item";
-
-    const emptyText = document.createElement("p");
-    emptyText.className = "booking-meta";
-    emptyText.textContent = message;
-
-    emptyState.appendChild(emptyText);
-    bookingList.appendChild(emptyState);
-}
-
-async function releaseBooking(booking) {
-    const confirmation = window.confirm(`Liberar o horario ${booking.time} de ${booking.name} em ${formatDate(booking.date)}?`);
-
-    if (!confirmation) {
-        return;
-    }
-
-    try {
-        const response = await fetch(`/api/bookings/${encodeURIComponent(booking.id)}`, {
-            method: "DELETE",
-            headers: {
-                Accept: "application/json"
-            }
-        });
-        const payload = await response.json();
+        const response = await fetch(`/api/availability?date=${encodeURIComponent(date)}`);
+        const data = await response.json();
 
         if (!response.ok) {
-            throw new Error(payload.error || "Nao foi possivel liberar o horario.");
+            throw new Error(data.error || "Erro ao carregar horarios");
         }
 
-        setFeedback("Horario liberado com sucesso. Ele voltou para a lista de disponibilidade.", "success");
-        await loadBookings(booking.date);
+        timeSelect.innerHTML = "";
 
-        if (dateInput.value === booking.date) {
-            await loadAvailability(booking.date);
+        if (!data.available.length) {
+            setTimePlaceholder("Sem horarios disponiveis");
+            availabilityMessage.textContent = `Sem horarios disponiveis para ${data.weekdayLabel} (${data.formattedDate}).`;
+            return;
         }
+
+        timeSelect.disabled = false;
+        timeSelect.innerHTML = '<option value="">Selecione um horario</option>';
+
+        data.available.forEach(time => {
+            const option = document.createElement("option");
+            option.value = time;
+            option.textContent = time;
+            timeSelect.appendChild(option);
+        });
+
+        availabilityMessage.textContent = `${data.weekdayLabel} com ${data.available.length} horario(s) disponivel(is) em ${data.formattedDate}.`;
     } catch (error) {
-        setFeedback(error.message || "Erro ao liberar o horario.", "error");
+        setTimePlaceholder("Nao foi possivel carregar");
+        availabilityMessage.textContent = error.message || "Erro ao carregar horarios.";
     }
 }
 
-function createBookingCard(booking) {
-    const item = document.createElement("article");
-    item.className = "booking-item";
-
-    const header = document.createElement("div");
-    header.className = "booking-item-header";
-
-    const titleWrap = document.createElement("div");
-    const time = document.createElement("strong");
-    time.className = "booking-time";
-    time.textContent = `${booking.time} - ${booking.name}`;
-    titleWrap.appendChild(time);
-
-    const phone = document.createElement("p");
-    phone.className = "booking-meta";
-    phone.textContent = `Telefone: ${booking.phone}`;
-    titleWrap.appendChild(phone);
-
-    const releaseButton = document.createElement("button");
-    releaseButton.type = "button";
-    releaseButton.className = "release-button";
-    releaseButton.textContent = "Liberar horario";
-    releaseButton.addEventListener("click", async () => {
-        releaseButton.disabled = true;
-        releaseButton.textContent = "Liberando...";
-        await releaseBooking(booking);
-        releaseButton.disabled = false;
-        releaseButton.textContent = "Liberar horario";
-    });
-
-    header.append(titleWrap, releaseButton);
-
-    const services = document.createElement("p");
-    services.className = "booking-services";
-    services.textContent = `Servicos: ${booking.services.map((service) => service.name).join(", ")}`;
-
-    item.append(header, services);
-
-    if (booking.notes) {
-        const notes = document.createElement("p");
-        notes.className = "booking-notes";
-        notes.textContent = `Observacoes: ${booking.notes}`;
-        item.appendChild(notes);
+function renderActionButtons(booking) {
+    if (booking.status !== "pending") {
+        return "<p class=\"booking-hint\">Status atualizado pelo administrador.</p>";
     }
 
-    return item;
+    return `
+        <div class="booking-actions">
+            <button type="button" class="success-button" data-action="complete" data-booking-id="${escapeHTML(booking.id)}">Finalizar</button>
+            <button type="button" class="danger-button" data-action="cancel" data-booking-id="${escapeHTML(booking.id)}">Cancelar</button>
+        </div>
+    `;
 }
 
-function renderBookings(payload) {
-    clearBookingList();
+function renderBookingList(bookings) {
+    bookingList.innerHTML = "";
 
-    if (payload.bookings.length === 0) {
-        manageMessage.textContent = `Nenhum agendamento salvo em ${formatDate(payload.date)}.`;
-        renderEmptyBookings("Quando voce tiver atendimentos nessa data, eles vao aparecer aqui para liberar depois.");
+    if (!bookings.length) {
+        bookingList.innerHTML = '<div class="empty-state">Nenhum agendamento encontrado para a data selecionada.</div>';
         return;
     }
 
-    manageMessage.textContent = `${payload.weekdayLabel} com ${payload.bookings.length} agendamento(s) salvo(s) em ${formatDate(payload.date)}.`;
-    payload.bookings.forEach((booking) => {
-        bookingList.appendChild(createBookingCard(booking));
+    bookings.forEach(booking => {
+        const servicesText = Array.isArray(booking.services) && booking.services.length
+            ? booking.services.map(service => service.name).join(", ")
+            : "Sem servicos informados";
+
+        const article = document.createElement("article");
+        article.className = `booking-item ${booking.status}`;
+        article.innerHTML = `
+            <div class="booking-header">
+                <div>
+                    <p class="booking-time">${escapeHTML(booking.time)}</p>
+                    <p class="booking-name">${escapeHTML(booking.name || "Cliente sem nome")}</p>
+                </div>
+                <span class="status-badge ${escapeHTML(booking.status)}">${escapeHTML(STATUS_LABELS[booking.status] || "Agendado")}</span>
+            </div>
+            <p class="booking-meta">${escapeHTML(booking.phone || "Sem telefone informado")}</p>
+            <p class="booking-meta">${escapeHTML(servicesText)}</p>
+            ${booking.total ? `<p class="booking-meta">Total: ${escapeHTML(booking.total)}</p>` : ""}
+            ${booking.notes ? `<p class="booking-notes">${escapeHTML(booking.notes)}</p>` : ""}
+            ${renderActionButtons(booking)}
+        `;
+
+        bookingList.appendChild(article);
     });
 }
 
-async function loadBookings(dateValue) {
-    if (!dateValue) {
-        manageMessage.textContent = "Escolha uma data para consultar os agendamentos salvos.";
-        clearBookingList();
+async function loadBookings() {
+    if (!adminAuthenticated) {
         return;
     }
 
-    manageMessage.textContent = "Consultando agendamentos salvos...";
-    clearBookingList();
+    const date = manageDate.value;
+
+    if (!date) {
+        bookingList.innerHTML = "";
+        manageMessage.textContent = "Escolha uma data para carregar os agendamentos.";
+        return;
+    }
+
+    manageMessage.textContent = "Carregando agendamentos...";
+    bookingList.innerHTML = "";
 
     try {
-        const payload = await fetchBookings(dateValue);
-        renderBookings(payload);
+        const response = await fetch(`/api/bookings?date=${encodeURIComponent(date)}`);
+        const data = await response.json();
+
+        if (response.status === 401) {
+            handleSessionExpired();
+            return;
+        }
+
+        if (!response.ok) {
+            throw new Error(data.error || "Erro ao carregar agendamentos");
+        }
+
+        manageMessage.textContent = data.message;
+        renderBookingList(data.bookings);
     } catch (error) {
-        manageMessage.textContent = "Nao foi possivel carregar os agendamentos agora.";
-        setFeedback(error.message || "Erro ao consultar os agendamentos.", "error");
+        bookingList.innerHTML = "";
+        manageMessage.textContent = error.message || "Nao foi possivel carregar os agendamentos.";
     }
 }
 
-function getSelectedServices() {
-    return serviceCheckboxes
-        .filter((checkbox) => checkbox.checked)
-        .map((checkbox) => ({
+async function updateBookingStatus(bookingId, status) {
+    const actionLabel = status === "completed" ? "finalizar" : "cancelar";
+
+    if (!window.confirm(`Deseja realmente ${actionLabel} este agendamento?`)) {
+        return;
+    }
+
+    try {
+        const response = await fetch(`/api/bookings/${bookingId}/status`, {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ status })
+        });
+
+        const data = await response.json();
+
+        if (response.status === 401) {
+            handleSessionExpired();
+            return;
+        }
+
+        if (!response.ok) {
+            throw new Error(data.error || "Nao foi possivel atualizar o agendamento");
+        }
+
+        await loadBookings();
+
+        if (dateInput.value === data.booking.date || manageDate.value === data.booking.date) {
+            await loadAvailability(data.booking.date);
+        }
+    } catch (error) {
+        manageMessage.textContent = error.message || "Nao foi possivel atualizar o agendamento.";
+    }
+}
+
+async function handleLogin(event) {
+    event.preventDefault();
+    authMessage.textContent = "Validando acesso...";
+
+    try {
+        const user = document.getElementById("user").value.trim();
+        const pass = document.getElementById("pass").value;
+
+        const response = await fetch("/api/login", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ user, pass })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error || "Login invalido");
+        }
+
+        setAdminState(true);
+
+        if (manageDate.value) {
+            await loadBookings();
+        }
+    } catch (error) {
+        authMessage.textContent = error.message || "Nao foi possivel fazer login.";
+    }
+}
+
+async function handleLogout() {
+    try {
+        await fetch("/api/logout", { method: "POST" });
+    } finally {
+        setAdminState(false);
+        loginForm.reset();
+        authMessage.textContent = "Sessao encerrada.";
+    }
+}
+
+async function handleBookingSubmit(event) {
+    event.preventDefault();
+    showBookingFeedback("");
+
+    const services = [...serviceCheckboxes]
+        .filter(checkbox => checkbox.checked)
+        .map(checkbox => ({
             name: checkbox.dataset.name,
             price: Number(checkbox.value)
         }));
-}
 
-async function handleSubmit(event) {
-    event.preventDefault();
-    clearFeedback();
-
-    const services = getSelectedServices();
-    const formData = {
+    const body = {
         name: document.getElementById("name").value.trim(),
         phone: document.getElementById("phone").value.trim(),
         date: dateInput.value,
         time: timeSelect.value,
         services,
         total: totalAmount.textContent,
-        notes: document.getElementById("notes").value.trim()
+        notes: notesInput.value.trim()
     };
 
-    if (!formData.date || !formData.time) {
-        setFeedback("Escolha uma data e um horario disponivel para continuar.", "error");
+    if (!body.name) {
+        showBookingFeedback("Digite o nome da cliente.", true);
         return;
     }
 
-    if (services.length === 0) {
-        setFeedback("Selecione pelo menos um servico.", "error");
+    if (!body.phone) {
+        showBookingFeedback("Digite o telefone ou WhatsApp da cliente.", true);
         return;
     }
 
-    submitButton.disabled = true;
-    submitButton.textContent = "Confirmando...";
+    if (!body.date) {
+        showBookingFeedback("Escolha uma data para o agendamento.", true);
+        return;
+    }
+
+    if (!body.time) {
+        showBookingFeedback("Escolha um horario disponivel.", true);
+        return;
+    }
+
+    if (!body.services.length) {
+        showBookingFeedback("Selecione pelo menos um servico.", true);
+        return;
+    }
+
+    const whatsappWindow = window.open("", "_blank");
 
     try {
         const response = await fetch("/api/bookings", {
             method: "POST",
             headers: {
-                "Content-Type": "application/json",
-                Accept: "application/json"
+                "Content-Type": "application/json"
             },
-            body: JSON.stringify(formData)
+            body: JSON.stringify(body)
         });
-        const payload = await response.json();
+
+        const data = await response.json();
 
         if (response.status === 409) {
-            setFeedback(payload.error || "Esse horario acabou de ser reservado.", "error");
-            await loadAvailability(formData.date);
+            if (whatsappWindow) {
+                whatsappWindow.close();
+            }
+
+            showBookingFeedback("Este horario ja foi reservado. Escolha outro horario.", true);
+            await loadAvailability(body.date);
             return;
         }
 
         if (!response.ok) {
-            throw new Error(payload.error || "Nao foi possivel concluir o agendamento.");
+            throw new Error(data.error || "Nao foi possivel salvar o agendamento");
         }
 
-        setFeedback("Agendamento registrado com sucesso. O horario escolhido foi removido da disponibilidade.", "success");
+        const whatsappMessage = buildWhatsAppMessage(body);
+        const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(whatsappMessage)}`;
 
-        const whatsappNumber = "5575981754628";
-        const whatsappMessage = buildWhatsappMessage(formData);
-        const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappMessage)}`;
-        window.open(whatsappUrl, "_blank");
+        if (whatsappWindow) {
+            whatsappWindow.location.href = whatsappUrl;
+        } else {
+            window.location.href = whatsappUrl;
+        }
 
+        showBookingFeedback("Agendamento salvo com sucesso. A mensagem do WhatsApp foi preparada.");
         bookingForm.reset();
+        dateInput.value = body.date;
         updateTotal();
-        dateInput.value = formData.date;
-        await loadAvailability(formData.date);
-        manageDateInput.value = formData.date;
-        await loadBookings(formData.date);
+        await loadAvailability(body.date);
+
+        if (adminAuthenticated && manageDate.value === body.date) {
+            await loadBookings();
+        }
     } catch (error) {
-        setFeedback(error.message || "Erro inesperado ao salvar o agendamento.", "error");
-    } finally {
-        submitButton.disabled = false;
-        submitButton.textContent = "Confirmar agendamento";
+        if (whatsappWindow) {
+            whatsappWindow.close();
+        }
+
+        showBookingFeedback(error.message || "Nao foi possivel salvar o agendamento.", true);
     }
 }
 
-dateInput.min = getTodayAsInputValue();
+loginForm.addEventListener("submit", handleLogin);
+logoutButton.addEventListener("click", handleLogout);
+manageDate.addEventListener("change", loadBookings);
+dateInput.addEventListener("change", () => loadAvailability(dateInput.value));
+bookingForm.addEventListener("submit", handleBookingSubmit);
 
-serviceCheckboxes.forEach((checkbox) => {
+serviceCheckboxes.forEach(checkbox => {
     checkbox.addEventListener("change", updateTotal);
 });
 
-dateInput.addEventListener("change", async () => {
-    clearFeedback();
-    await loadAvailability(dateInput.value);
+bookingList.addEventListener("click", event => {
+    const button = event.target.closest("button[data-action]");
+
+    if (!button) {
+        return;
+    }
+
+    const { action, bookingId } = button.dataset;
+
+    if (action === "complete") {
+        updateBookingStatus(bookingId, "completed");
+    }
+
+    if (action === "cancel") {
+        updateBookingStatus(bookingId, "cancelled");
+    }
 });
 
-manageDateInput.addEventListener("change", async () => {
-    clearFeedback();
-    await loadBookings(manageDateInput.value);
-});
-
-bookingForm.addEventListener("submit", handleSubmit);
-
+setTimePlaceholder("Escolha primeiro uma data");
+availabilityMessage.textContent = "Escolha uma data para ver os horarios disponiveis.";
+manageMessage.textContent = "Entre para visualizar os agendamentos.";
 updateTotal();
-resetTimeSelect("Escolha uma data para consultar os horarios disponiveis.");
-clearBookingList();
+checkAdminSession();

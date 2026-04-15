@@ -1,10 +1,12 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jacy Sallys | Agendamento Online</title>
-    <link rel="stylesheet" href="/style.css">
+    <meta name="theme-color" content="#b85d6a">
+    <link rel="icon" type="image/png" href="./favicon.png">
+    <link rel="stylesheet" href="./style.css">
 </head>
 <body>
     <div class="container">
@@ -67,12 +69,12 @@
                 </div>
             </section>
 
-            <section class="card">
-                <h2>Agendar Horario</h2>
+            <section class="card booking-card">
+                <h2>Agendar Hor&aacute;rio</h2>
 
                 <div class="schedule-board">
-                    <h3>Horarios disponiveis</h3>
-                    <p class="schedule-copy">A disponibilidade do formulario consulta o servidor em tempo real.</p>
+                    <h3>Hor&aacute;rios dispon&iacute;veis</h3>
+                    <p class="schedule-copy">A disponibilidade do formul&aacute;rio consulta o servidor em tempo real.</p>
 
                     <div class="schedule-grid">
                         <article class="day-card">
@@ -128,20 +130,6 @@
                         </article>
 
                         <article class="day-card">
-                            <h4>Sexta-feira</h4>
-                            <div class="time-list">
-                                <span class="time-pill">08:00</span>
-                                <span class="time-pill">09:30</span>
-                                <span class="time-pill">10:00</span>
-                                <span class="time-pill">11:30</span>
-                                <span class="time-pill">14:00</span>
-                                <span class="time-pill">15:30</span>
-                                <span class="time-pill">16:00</span>
-                                <span class="time-pill">17:30</span>
-                            </div>
-                        </article>
-
-                        <article class="day-card">
                             <h4>S&aacute;bado</h4>
                             <div class="time-list">
                                 <span class="time-pill">08:00</span>
@@ -173,81 +161,118 @@
                     </div>
 
                     <div>
-                        <label for="time">Horario</label>
+                        <label for="time">Hor&aacute;rio</label>
                         <select id="time" required disabled>
                             <option value="">Escolha primeiro uma data</option>
                         </select>
-                        <p class="field-hint" id="availabilityMessage">Escolha uma data para consultar os horarios disponiveis.</p>
                     </div>
 
-                    <div>
-                        <label>Selecione os servicos</label>
-                        <div class="service-selector">
-                            <label class="service-checkbox">
+                    <div class="services-field">
+                        <p class="field-label">Servi&ccedil;os</p>
+                        <div class="services-grid">
+                            <label class="service-option">
                                 <input type="checkbox" name="service" value="20" data-name="P&eacute;">
-                                <span>P&eacute; - R$ 20,00</span>
+                                <span>P&eacute;</span>
+                                <strong>R$ 20,00</strong>
                             </label>
-                            <label class="service-checkbox">
+
+                            <label class="service-option">
                                 <input type="checkbox" name="service" value="25" data-name="M&atilde;o">
-                                <span>M&atilde;o - R$ 25,00</span>
+                                <span>M&atilde;o</span>
+                                <strong>R$ 25,00</strong>
                             </label>
-                            <label class="service-checkbox">
+
+                            <label class="service-option">
                                 <input type="checkbox" name="service" value="45" data-name="P&eacute; e M&atilde;o">
-                                <span>P&eacute; e M&atilde;o - R$ 45,00</span>
+                                <span>P&eacute; e M&atilde;o</span>
+                                <strong>R$ 45,00</strong>
                             </label>
-                            <label class="service-checkbox">
+
+                            <label class="service-option">
                                 <input type="checkbox" name="service" value="75" data-name="Posti&ccedil;a simples">
-                                <span>Posti&ccedil;a simples - R$ 75,00</span>
+                                <span>Posti&ccedil;a simples</span>
+                                <strong>R$ 75,00</strong>
                             </label>
-                            <label class="service-checkbox">
+
+                            <label class="service-option">
                                 <input type="checkbox" name="service" value="80" data-name="Posti&ccedil;as decoradas">
-                                <span>Posti&ccedil;as decoradas - R$ 80,00</span>
+                                <span>Posti&ccedil;as decoradas</span>
+                                <strong>R$ 80,00</strong>
                             </label>
-                            <label class="service-checkbox">
+
+                            <label class="service-option">
                                 <input type="checkbox" name="service" value="75" data-name="Blindagem">
-                                <span>Blindagem - R$ 75,00</span>
+                                <span>Blindagem</span>
+                                <strong>R$ 75,00</strong>
                             </label>
-                            <label class="service-checkbox">
+
+                            <label class="service-option">
                                 <input type="checkbox" name="service" value="30" data-name="Esmalta&ccedil;&atilde;o em gel">
-                                <span>Esmalta&ccedil;&atilde;o em gel - R$ 30,00</span>
+                                <span>Esmalta&ccedil;&atilde;o em gel</span>
+                                <strong>R$ 30,00</strong>
                             </label>
-                            <label class="service-checkbox">
+
+                            <label class="service-option">
                                 <input type="checkbox" name="service" value="70" data-name="Manuten&ccedil;&atilde;o">
-                                <span>Manuten&ccedil;&atilde;o - R$ 70,00</span>
+                                <span>Manuten&ccedil;&atilde;o</span>
+                                <strong>R$ 70,00</strong>
                             </label>
-                            <label class="service-checkbox">
+
+                            <label class="service-option">
                                 <input type="checkbox" name="service" value="30" data-name="Remo&ccedil;&atilde;o">
-                                <span>Remo&ccedil;&atilde;o - R$ 30,00</span>
+                                <span>Remo&ccedil;&atilde;o</span>
+                                <strong>R$ 30,00</strong>
                             </label>
                         </div>
                     </div>
 
-                    <div class="total-price">
-                        <h3>Total do agendamento</h3>
-                        <div class="total-amount" id="totalAmount">R$ 0,00</div>
+                    <div class="total-box" aria-live="polite">
+                        <span>Total estimado</span>
+                        <strong id="totalAmount">R$ 0,00</strong>
                     </div>
 
                     <div>
-                        <label for="notes">Observacoes (opcional)</label>
-                        <textarea id="notes" rows="3" placeholder="Alguma preferencia ou observacao?"></textarea>
+                        <label for="notes">Observa&ccedil;&otilde;es</label>
+                        <textarea id="notes" rows="3" placeholder="Se quiser, escreva algum detalhe do atendimento"></textarea>
                     </div>
 
-                    <button type="submit" id="submitButton">Confirmar agendamento</button>
+                    <p id="availabilityMessage" class="helper-message">Escolha uma data para ver os hor&aacute;rios dispon&iacute;veis.</p>
+                    <p id="bookingFeedback" class="booking-feedback" hidden></p>
+
+                    <button type="submit">Confirmar agendamento</button>
                 </form>
+            </section>
 
-                <div class="feedback" id="feedbackMessage" hidden></div>
+            <section class="card admin-card">
+                <div class="section-heading">
+                    <div>
+                        <p class="eyebrow">Administra&ccedil;&atilde;o</p>
+                        <h2>Gerenciar Agendamentos</h2>
+                    </div>
+                    <button id="logoutButton" type="button" class="secondary-button" hidden>Sair</button>
+                </div>
 
-                <div class="manager-panel">
-                    <h3>Liberar horario concluido</h3>
-                    <p class="manager-copy">Escolha a data do atendimento para ver os agendamentos salvos e liberar o horario quando o servico terminar.</p>
+                <div id="loginBox" class="admin-login">
+                    <h3>&Aacute;rea do administrador</h3>
+                    <p>Entre para visualizar, finalizar ou cancelar agendamentos.</p>
 
-                    <div class="manager-controls">
-                        <label for="manageDate">Data do atendimento</label>
+                    <form id="loginForm" class="admin-form">
+                        <input id="user" name="user" autocomplete="username" placeholder="Usu&aacute;rio" required>
+                        <input id="pass" name="pass" type="password" autocomplete="current-password" placeholder="Senha" required>
+                        <button type="submit">Entrar</button>
+                    </form>
+
+                    <p id="authMessage" class="helper-message">Use seu login para acessar a agenda administrativa.</p>
+                </div>
+
+                <div id="managerPanel" class="manager-panel" hidden>
+                    <div class="manager-toolbar">
+                        <label for="manageDate">Selecionar data</label>
                         <input type="date" id="manageDate">
                     </div>
 
-                    <p class="field-hint" id="manageMessage">Escolha uma data para consultar os agendamentos salvos.</p>
-                    <div class="booking-list" id="bookingList"></div>
+                    <p id="manageMessage" class="helper-message">Escolha uma data para carregar os agendamentos.</p>
+                    <div id="bookingList" class="booking-list"></div>
                 </div>
             </section>
         </main>
@@ -255,10 +280,10 @@
         <footer>
             <p><strong>Jacy Sallys - Nail Designer</strong></p>
             <p>Beleza e cuidado para suas unhas.</p>
-            <p class="footer-copy">Entre em contato para mais informacoes e confirmacoes.</p>
+            <p><a class="footer-link" href="https://www.instagram.com/jacy.nailsdesigner_/" target="_blank" rel="noopener noreferrer">Instagram: @jacy.nailsdesigner_</a></p>
         </footer>
     </div>
 
-    <script src="/app.js" defer></script>
+    <script src="./app.js" defer></script>
 </body>
 </html>
