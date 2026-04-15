@@ -23,6 +23,16 @@ const STATUS_LABELS = {
 };
 
 const WHATSAPP_NUMBER = "5575981754628";
+const WHATSAPP_EMOJIS = {
+    butterfly: String.fromCodePoint(0x1F98B),
+    person: String.fromCodePoint(0x1F464),
+    phone: String.fromCodePoint(0x1F4F1),
+    date: String.fromCodePoint(0x1F4C5),
+    time: String.fromCodePoint(0x1F550),
+    services: String.fromCodePoint(0x1F485),
+    total: String.fromCodePoint(0x1F4B0),
+    notes: String.fromCodePoint(0x1F4DD)
+};
 
 let adminAuthenticated = false;
 
@@ -77,20 +87,20 @@ function updateTotal() {
 function buildWhatsAppMessage(body) {
     const servicesText = body.services.map(service => `* ${service.name}`).join("\n");
 
-    let message = `*Novo agendamento - Jacy Sallys*
+    let message = `${WHATSAPP_EMOJIS.butterfly} *Novo agendamento - Jacy Sallys* ${WHATSAPP_EMOJIS.butterfly}
 
-Nome: ${body.name}
-Telefone: ${body.phone}
-Data: ${formatDateBR(body.date)}
-Horario: ${body.time}
+${WHATSAPP_EMOJIS.person} Nome: ${body.name}
+${WHATSAPP_EMOJIS.phone} Telefone: ${body.phone}
+${WHATSAPP_EMOJIS.date} Data: ${formatDateBR(body.date)}
+${WHATSAPP_EMOJIS.time} Horario: ${body.time}
 
-Servicos:
+${WHATSAPP_EMOJIS.services} Servicos:
 ${servicesText}
 
-Total: ${body.total}`;
+${WHATSAPP_EMOJIS.total} Total: ${body.total}`;
 
     if (body.notes) {
-        message += `\n\nObservacoes:\n${body.notes}`;
+        message += `\n\n${WHATSAPP_EMOJIS.notes} Observacoes:\n${body.notes}`;
     }
 
     return message;
@@ -122,10 +132,13 @@ function prepareWhatsAppWindow(whatsappWindow) {
 }
 
 function openWhatsApp(whatsappMessage, whatsappWindow) {
-    const encodedMessage = encodeURIComponent(whatsappMessage);
-    const appUrl = `whatsapp://send?phone=${WHATSAPP_NUMBER}&text=${encodedMessage}`;
-    const mobileWebUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodedMessage}`;
-    const desktopWebUrl = `https://web.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${encodedMessage}`;
+    const searchParams = new URLSearchParams({
+        phone: WHATSAPP_NUMBER,
+        text: whatsappMessage
+    });
+    const appUrl = `whatsapp://send?${searchParams.toString()}`;
+    const mobileWebUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(whatsappMessage)}`;
+    const desktopWebUrl = `https://web.whatsapp.com/send?${searchParams.toString()}`;
     const isMobileDevice = /Android|iPhone|iPad|iPod|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
     if (!isMobileDevice) {
