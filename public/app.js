@@ -23,16 +23,6 @@ const STATUS_LABELS = {
 };
 
 const WHATSAPP_NUMBER = "5575981754628";
-const WHATSAPP_EMOJIS = {
-    butterfly: String.fromCodePoint(0x1F98B),
-    person: String.fromCodePoint(0x1F464),
-    phone: String.fromCodePoint(0x1F4F1),
-    date: String.fromCodePoint(0x1F4C5),
-    time: String.fromCodePoint(0x1F550),
-    services: String.fromCodePoint(0x1F485),
-    total: String.fromCodePoint(0x1F4B0),
-    notes: String.fromCodePoint(0x1F4DD)
-};
 
 let adminAuthenticated = false;
 
@@ -87,107 +77,43 @@ function updateTotal() {
 function buildWhatsAppMessage(body) {
     const servicesText = body.services.map(service => `* ${service.name}`).join("\n");
 
-    let message = `${WHATSAPP_EMOJIS.butterfly} *Novo agendamento - Jacy Sallys* ${WHATSAPP_EMOJIS.butterfly}
+    let message = `🦋 *Novo agendamento - Jacy Sallys* 🦋
 
-${WHATSAPP_EMOJIS.person} Nome: ${body.name}
-${WHATSAPP_EMOJIS.phone} Telefone: ${body.phone}
-${WHATSAPP_EMOJIS.date} Data: ${formatDateBR(body.date)}
-${WHATSAPP_EMOJIS.time} Horario: ${body.time}
+👤 Nome: ${body.name}
+📱 Telefone: ${body.phone}
+📅 Data: ${formatDateBR(body.date)}
+🕐 Horario: ${body.time}
 
-${WHATSAPP_EMOJIS.services} Servicos:
+💅 Servicos:
 ${servicesText}
 
-${WHATSAPP_EMOJIS.total} Total: ${body.total}`;
+💰 Total: ${body.total}`;
 
     if (body.notes) {
-        message += `\n\n${WHATSAPP_EMOJIS.notes} Observacoes:\n${body.notes}`;
+        message += `\n\n📝 Observacoes:\n${body.notes}`;
     }
 
     return message;
 }
-
-function prepareWhatsAppWindow(whatsappWindow) {
-    if (!whatsappWindow || whatsappWindow.closed) {
-        return;
-    }
-
-    try {
-        whatsappWindow.document.write(`<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <title>Abrindo WhatsApp...</title>
-</head>
-<body style="margin:0;font-family:Arial,sans-serif;background:#f6efe9;color:#5f3f37;display:grid;place-items:center;min-height:100vh;">
-    <div style="text-align:center;padding:32px;">
-        <p style="font-size:18px;font-weight:bold;margin:0 0 12px;">Abrindo WhatsApp...</p>
-        <p style="margin:0;">Estamos preparando a mensagem do agendamento.</p>
-    </div>
-</body>
-</html>`);
-        whatsappWindow.document.close();
-    } catch {
-        // Ignore cross-origin or popup rendering issues.
-    }
-}
-
-function openWhatsApp(whatsappMessage, whatsappWindow) {
-    const searchParams = new URLSearchParams({
-        phone: WHATSAPP_NUMBER,
-        text: whatsappMessage
-    });
-    const appUrl = `whatsapp://send?${searchParams.toString()}`;
-    const mobileWebUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(whatsappMessage)}`;
-    const desktopWebUrl = `https://web.whatsapp.com/send?${searchParams.toString()}`;
+function openWhatsApp(whatsappMessage) {
+    const encodedMessage = encodeURIComponent(whatsappMessage);
+    const appUrl = `whatsapp://send?phone=${WHATSAPP_NUMBER}&text=${encodedMessage}`;
+    const mobileWebUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodedMessage}`;
+    const desktopWebUrl = `https://web.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${encodedMessage}`;
     const isMobileDevice = /Android|iPhone|iPad|iPod|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
     if (!isMobileDevice) {
-        if (whatsappWindow && !whatsappWindow.closed) {
-            whatsappWindow.location.replace(desktopWebUrl);
-        } else {
-            window.open(desktopWebUrl, "_blank");
-        }
-
-        return;
-    }
-
-    let fallbackTimer = null;
-
-    const cancelFallback = () => {
-        if (fallbackTimer) {
-            clearTimeout(fallbackTimer);
-            fallbackTimer = null;
-        }
-
-        window.removeEventListener("blur", cancelFallback);
-        document.removeEventListener("visibilitychange", handleVisibilityChange);
-    };
-
-    const handleVisibilityChange = () => {
-        if (document.hidden) {
-            cancelFallback();
-        }
-    };
-
-    window.addEventListener("blur", cancelFallback, { once: true });
-    document.addEventListener("visibilitychange", handleVisibilityChange);
-
-    fallbackTimer = setTimeout(() => {
-        if (whatsappWindow && !whatsappWindow.closed) {
-            whatsappWindow.location.replace(mobileWebUrl);
-        } else {
-            window.location.href = mobileWebUrl;
-        }
-
-        cancelFallback();
-    }, 1200);
-
-    if (whatsappWindow && !whatsappWindow.closed) {
-        whatsappWindow.location.replace(appUrl);
+        window.open(desktopWebUrl, "_blank", "noopener");
         return;
     }
 
     window.location.href = appUrl;
+
+    setTimeout(() => {
+        if (!document.hidden) {
+            window.location.href = mobileWebUrl;
+        }
+    }, 1200);
 }
 
 function setAdminState(authenticated) {
@@ -485,10 +411,6 @@ async function handleBookingSubmit(event) {
         return;
     }
 
-    const whatsappWindow = window.open("", "_blank");
-
-    prepareWhatsAppWindow(whatsappWindow);
-
     try {
         const response = await fetch("/api/bookings", {
             method: "POST",
@@ -501,10 +423,6 @@ async function handleBookingSubmit(event) {
         const data = await response.json();
 
         if (response.status === 409) {
-            if (whatsappWindow) {
-                whatsappWindow.close();
-            }
-
             showBookingFeedback("Este horario ja foi reservado. Escolha outro horario.", true);
             await loadAvailability(body.date);
             return;
@@ -515,7 +433,7 @@ async function handleBookingSubmit(event) {
         }
 
         const whatsappMessage = buildWhatsAppMessage(body);
-        openWhatsApp(whatsappMessage, whatsappWindow);
+        openWhatsApp(whatsappMessage);
 
         showBookingFeedback("Agendamento salvo com sucesso. A mensagem do WhatsApp foi preparada.");
         bookingForm.reset();
@@ -527,10 +445,6 @@ async function handleBookingSubmit(event) {
             await loadBookings();
         }
     } catch (error) {
-        if (whatsappWindow) {
-            whatsappWindow.close();
-        }
-
         showBookingFeedback(error.message || "Nao foi possivel salvar o agendamento.", true);
     }
 }
