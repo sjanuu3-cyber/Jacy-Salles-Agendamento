@@ -98,22 +98,52 @@ ${servicesText}
 function openWhatsApp(whatsappMessage) {
     const encodedMessage = encodeURIComponent(whatsappMessage);
     const appUrl = `whatsapp://send?phone=${WHATSAPP_NUMBER}&text=${encodedMessage}`;
+    const androidIntentUrl = `intent://send?phone=${WHATSAPP_NUMBER}&text=${encodedMessage}#Intent;scheme=whatsapp;package=com.whatsapp;end`;
     const mobileWebUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodedMessage}`;
     const desktopWebUrl = `https://web.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${encodedMessage}`;
-    const isMobileDevice = /Android|iPhone|iPad|iPod|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    const isAndroid = /Android/i.test(navigator.userAgent);
+    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+    const isMobileDevice = isAndroid || isIOS || /IEMobile|Opera Mini/i.test(navigator.userAgent);
 
     if (!isMobileDevice) {
         window.open(desktopWebUrl, "_blank", "noopener");
         return;
     }
 
-    window.location.href = appUrl;
+    let fallbackTimer = null;
 
-    setTimeout(() => {
-        if (!document.hidden) {
-            window.location.href = mobileWebUrl;
+    const cancelFallback = () => {
+        if (fallbackTimer) {
+            clearTimeout(fallbackTimer);
+            fallbackTimer = null;
         }
+
+        window.removeEventListener("blur", cancelFallback);
+        document.removeEventListener("visibilitychange", handleVisibilityChange);
+        window.removeEventListener("pagehide", cancelFallback);
+    };
+
+    const handleVisibilityChange = () => {
+        if (document.hidden) {
+            cancelFallback();
+        }
+    };
+
+    window.addEventListener("blur", cancelFallback, { once: true });
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    window.addEventListener("pagehide", cancelFallback, { once: true });
+
+    fallbackTimer = setTimeout(() => {
+        window.location.replace(mobileWebUrl);
+        cancelFallback();
     }, 1200);
+
+    if (isAndroid) {
+        window.location.replace(androidIntentUrl);
+        return;
+    }
+
+    window.location.replace(appUrl);
 }
 
 function setAdminState(authenticated) {
