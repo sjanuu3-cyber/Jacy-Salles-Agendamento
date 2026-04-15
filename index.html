@@ -1,565 +1,201 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jacy Sallys | Agendamento Online</title>
-    <link rel="stylesheet" href="style.css">
+<script>
+const bookingForm = document.getElementById("bookingForm");
+const dateInput = document.getElementById("date");
+const timeSelect = document.getElementById("time");
+const availabilityMessage = document.getElementById("availabilityMessage");
+const totalAmount = document.getElementById("totalAmount");
+const successMessage = document.getElementById("successMessage");
+const serviceCheckboxes = document.querySelectorAll('input[name="service"]');
 
-</head>
-<body>
-    <div class="container">
-        <header>
-            <h1>Jacy Sallys</h1>
-            <div class="butterfly">🦋</div>
-            <p class="subtitle">Nail Designer</p>
-            <p class="tagline">Cuidado, beleza e praticidade no seu agendamento.</p>
-        </header>
+/* ================= LOGIN ================= */
 
-        <div class="main-content">
-            <!-- Tabela de Valores -->
-            <div class="card">
-                <h2>Tabela de Valores</h2>
-                
-                <div class="price-section">
-                    <h3>Unhas simples</h3>
-                    <div class="price-item">
-                        <span class="service-name">Pé</span>
-                        <span class="price">R$ 20,00</span>
-                    </div>
-                    <div class="price-item">
-                        <span class="service-name">Mão</span>
-                        <span class="price">R$ 25,00</span>
-                    </div>
-                    <div class="price-item">
-                        <span class="service-name">Pé e Mão</span>
-                        <span class="price">R$ 45,00</span>
-                    </div>
-                </div>
+function login() {
+    const user = document.getElementById("user").value;
+    const pass = document.getElementById("pass").value;
 
-                <div class="price-section">
-                    <h3>Alongamentos</h3>
-                    <div class="price-item">
-                        <span class="service-name">Postiça simples</span>
-                        <span class="price">R$ 75,00</span>
-                    </div>
-                    <div class="price-item">
-                        <span class="service-name">Postiças decorada</span>
-                        <span class="price">R$ 80,00</span>
-                    </div>
-                    <div class="price-item">
-                        <span class="service-name">Blindagem</span>
-                        <span class="price">R$ 75,00</span>
-                    </div>
-                </div>
+    fetch("/api/login", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ user, pass })
+    })
+    .then(res => {
+        if (!res.ok) throw new Error();
+        return res.json();
+    })
+    .then(() => {
+        localStorage.setItem("admin", "true");
+        alert("Login realizado!");
+        location.reload();
+    })
+    .catch(() => {
+        alert("Login inválido");
+    });
+}
 
-                <div class="price-section">
-                    <h3>Extras</h3>
-                    <div class="price-item">
-                        <span class="service-name">Esmaltação em gel</span>
-                        <span class="price">R$ 30,00</span>
-                    </div>
-                    <div class="price-item">
-                        <span class="service-name">Manutenção</span>
-                        <span class="price">R$ 70,00</span>
-                    </div>
-                    <div class="price-item">
-                        <span class="service-name">Remoção</span>
-                        <span class="price">R$ 30,00</span>
-                    </div>
-                </div>
-            </div>
+function logout() {
+    localStorage.removeItem("admin");
+    location.reload();
+}
 
-            <!-- Formulário de Agendamento -->
-            <div class="card">
-                <h2>Agendar Horário</h2>
-                
-                <div class="schedule-board">
-                    <h3>Horarios disponiveis</h3>
-                    <p class="schedule-copy">Os horarios do formulario seguem exatamente esta grade semanal.</p>
+function checkAdmin() {
+    const isAdmin = localStorage.getItem("admin");
+    const panel = document.querySelector(".manager-panel");
 
-                    <div class="schedule-grid">
-                        <article class="day-card">
-                            <h4>Segunda-feira</h4>
-                            <div class="time-list">
-                                <span class="time-pill">14:00</span>
-                                <span class="time-pill">15:30</span>
-                                <span class="time-pill">16:00</span>
-                                <span class="time-pill">17:30</span>
-                            </div>
-                        </article>
+    if (panel) {
+        panel.style.display = isAdmin === "true" ? "block" : "none";
+    }
+}
 
-                        <article class="day-card">
-                            <h4>Ter&ccedil;a-feira</h4>
-                            <div class="time-list">
-                                <span class="time-pill">08:00</span>
-                                <span class="time-pill">09:30</span>
-                                <span class="time-pill">10:00</span>
-                                <span class="time-pill">11:30</span>
-                                <span class="time-pill">14:00</span>
-                                <span class="time-pill">15:30</span>
-                                <span class="time-pill">16:00</span>
-                                <span class="time-pill">17:30</span>
-                            </div>
-                        </article>
+checkAdmin();
 
-                        <article class="day-card">
-                            <h4>Quarta-feira</h4>
-                            <div class="time-list">
-                                <span class="time-pill">08:00</span>
-                                <span class="time-pill">09:30</span>
-                                <span class="time-pill">10:00</span>
-                                <span class="time-pill">11:30</span>
-                                <span class="time-pill">14:00</span>
-                                <span class="time-pill">15:30</span>
-                                <span class="time-pill">16:00</span>
-                                <span class="time-pill">17:30</span>
-                            </div>
-                        </article>
+/* ================= TOTAL ================= */
 
-                        <article class="day-card">
-                            <h4>Quinta-feira</h4>
-                            <div class="time-list">
-                                <span class="time-pill">08:00</span>
-                                <span class="time-pill">09:30</span>
-                                <span class="time-pill">10:00</span>
-                                <span class="time-pill">11:30</span>
-                                <span class="time-pill">14:00</span>
-                                <span class="time-pill">15:30</span>
-                                <span class="time-pill">16:00</span>
-                                <span class="time-pill">17:30</span>
-                            </div>
-                        </article>
+function updateTotal() {
+    let total = 0;
 
-                        <article class="day-card">
-                            <h4>Sexta-feira</h4>
-                            <div class="time-list">
-                                <span class="time-pill">08:00</span>
-                                <span class="time-pill">09:30</span>
-                                <span class="time-pill">10:00</span>
-                                <span class="time-pill">11:30</span>
-                                <span class="time-pill">14:00</span>
-                                <span class="time-pill">15:30</span>
-                                <span class="time-pill">16:00</span>
-                                <span class="time-pill">17:30</span>
-                            </div>
-                        </article>
+    serviceCheckboxes.forEach(cb => {
+        if (cb.checked) total += Number(cb.value);
+    });
 
-                        <article class="day-card">
-                            <h4>S&aacute;bado</h4>
-                            <div class="time-list">
-                                <span class="time-pill">08:00</span>
-                                <span class="time-pill">09:30</span>
-                                <span class="time-pill">10:00</span>
-                                <span class="time-pill">11:30</span>
-                                <span class="time-pill">12:30</span>
-                                <span class="time-pill">14:00</span>
-                                <span class="time-pill">15:30</span>
-                            </div>
-                        </article>
-                    </div>
-                </div>
+    totalAmount.textContent = `R$ ${total.toFixed(2).replace(".", ",")}`;
+}
 
-                <form class="booking-form" id="bookingForm">
-                    <div>
-                        <label for="name">Nome Completo</label>
-                        <input type="text" id="name" required placeholder="Digite seu nome">
-                    </div>
+/* ================= DISPONIBILIDADE ================= */
 
-                    <div>
-                        <label for="phone">Telefone / WhatsApp</label>
-                        <input type="tel" id="phone" required placeholder="(00) 00000-0000">
-                    </div>
+async function loadAvailability(date) {
+    if (!date) return;
 
-                    <div>
-                        <label for="date">Data</label>
-                        <input type="date" id="date" required>
-                    </div>
+    availabilityMessage.textContent = "Carregando horários...";
 
-                    <div>
-                        <label for="time">Horário</label>
-                        <select id="time" required disabled>
-                            <option value="">Selecione um horário</option>
-                        </select>
-                        <p class="field-hint" id="availabilityMessage">Escolha uma data para ver os horarios disponiveis.</p>
-                    </div>
+    try {
+        const res = await fetch(`/api/availability?date=${date}`);
+        const data = await res.json();
 
-                    <div>
-                        <label>Selecione os serviços:</label>
-                        <div class="service-selector" id="serviceSelector">
-                            <label class="service-checkbox">
-                                <input type="checkbox" name="service" value="20" data-name="Pé">
-                                <span>Pé - R$ 20,00</span>
-                            </label>
-                            <label class="service-checkbox">
-                                <input type="checkbox" name="service" value="25" data-name="Mão">
-                                <span>Mão - R$ 25,00</span>
-                            </label>
-                            <label class="service-checkbox">
-                                <input type="checkbox" name="service" value="45" data-name="Pé e Mão">
-                                <span>Pé e Mão - R$ 45,00</span>
-                            </label>
-                            <label class="service-checkbox">
-                                <input type="checkbox" name="service" value="75" data-name="Postiça simples">
-                                <span>Postiça simples - R$ 75,00</span>
-                            </label>
-                            <label class="service-checkbox">
-                                <input type="checkbox" name="service" value="80" data-name="Postiças decorada">
-                                <span>Postiças decorada - R$ 80,00</span>
-                            </label>
-                            <label class="service-checkbox">
-                                <input type="checkbox" name="service" value="75" data-name="Blindagem">
-                                <span>Blindagem - R$ 75,00</span>
-                            </label>
-                            <label class="service-checkbox">
-                                <input type="checkbox" name="service" value="30" data-name="Esmaltação em gel">
-                                <span>Esmaltação em gel - R$ 30,00</span>
-                            </label>
-                            <label class="service-checkbox">
-                                <input type="checkbox" name="service" value="70" data-name="Manutenção">
-                                <span>Manutenção - R$ 70,00</span>
-                            </label>
-                            <label class="service-checkbox">
-                                <input type="checkbox" name="service" value="30" data-name="Remoção">
-                                <span>Remoção - R$ 30,00</span>
-                            </label>
-                        </div>
-                    </div>
+        timeSelect.innerHTML = "";
 
-                    <div class="total-price">
-                        <h3>Total do Agendamento</h3>
-                        <div class="total-amount" id="totalAmount">R$ 0,00</div>
-                    </div>
-
-                    <div>
-                        <label for="notes">Observações (opcional)</label>
-                        <textarea id="notes" rows="3" placeholder="Alguma preferência ou observação?"></textarea>
-                    </div>
-
-                    <button type="submit">Confirmar Agendamento 💅</button>
-                </form>
-
-                <div class="success-message" id="successMessage">
-                    ✅ Agendamento realizado com sucesso! Em breve você receberá uma confirmação.
-                </div>
-            </div>
-        </div>
-
-        <footer>
-            <div class="butterfly">🦋 ♥️ 🦋</div>
-            <p><strong>Jacy Sallys - Nail Designer</strong></p>
-            <p>Beleza e cuidado para suas unhas</p>
-            <p style="margin-top: 15px; font-size: 0.9em;">📍 Entre em contato para mais informações</p>
-        </footer>
-    </div>
-
-    <script>
-        // Definir data mínima como hoje
-        const dateInput = document.getElementById('date');
-        const today = new Date().toISOString().split('T')[0];
-        dateInput.min = today;
-
-        // Calcular total
-        const checkboxes = document.querySelectorAll('input[name="service"]');
-        const totalAmount = document.getElementById('totalAmount');
-
-        function updateTotal() {
-            let total = 0;
-            checkboxes.forEach(checkbox => {
-                if (checkbox.checked) {
-                    total += parseFloat(checkbox.value);
-                }
-            });
-            totalAmount.textContent = `R$ ${total.toFixed(2).replace('.', ',')}`;
+        if (!data.available || data.available.length === 0) {
+            timeSelect.innerHTML = `<option>Sem horários</option>`;
+            timeSelect.disabled = true;
+            availabilityMessage.textContent = "Sem horários disponíveis";
+            return;
         }
 
-        checkboxes.forEach(checkbox => {
-            checkbox.addEventListener('change', updateTotal);
+        timeSelect.disabled = false;
+
+        timeSelect.innerHTML = `<option value="">Selecione um horário</option>`;
+
+        data.available.forEach(time => {
+            const opt = document.createElement("option");
+            opt.value = time;
+            opt.textContent = time;
+            timeSelect.appendChild(opt);
         });
 
-        // Formulário
-        document.getElementById('bookingForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const name = document.getElementById('name').value;
-            const phone = document.getElementById('phone').value;
-            const date = document.getElementById('date').value;
-            const time = document.getElementById('time').value;
-            const notes = document.getElementById('notes').value;
-            
-            // Pegar serviços selecionados
-            const selectedServices = [];
-            checkboxes.forEach(checkbox => {
-                if (checkbox.checked) {
-                    selectedServices.push(checkbox.dataset.name);
-                }
-            });
+        availabilityMessage.textContent =
+            `${data.weekdayLabel} com ${data.available.length} horário(s) disponível(is)`;
 
-            if (selectedServices.length === 0) {
-                alert('Por favor, selecione pelo menos um serviço!');
-                return;
-            }
+    } catch (err) {
+        availabilityMessage.textContent = "Erro ao carregar horários";
+    }
+}
 
-            // Formatar data
-            const dateObj = new Date(date + 'T00:00:00');
-            const formattedDate = dateObj.toLocaleDateString('pt-BR');
+/* ================= EVENTOS ================= */
 
-            // Criar mensagem para WhatsApp
-            const total = totalAmount.textContent;
-            let message = `🦋 *Novo Agendamento - Jacy Sallys* 🦋\n\n`;
-            message += `👤 *Nome:* ${name}\n`;
-            message += `📅 *Data:* ${formattedDate}\n`;
-            message += `🕐 *Horário:* ${time}\n\n`;
-            message += `💅 *Serviços:*\n`;
-            selectedServices.forEach(service => {
-                message += `  • ${service}\n`;
-            });
-            message += `\n💰 *Total:* ${total}`;
-            
-            if (notes) {
-                message += `\n\n📝 *Observações:* ${notes}`;
-            }
+dateInput.addEventListener("change", () => {
+    loadAvailability(dateInput.value);
+});
 
-            // Mostrar mensagem de sucesso
-            document.getElementById('successMessage').style.display = 'block';
-            
-            // Abrir WhatsApp (substitua pelo número real)
-            const whatsappNumber = '5575981754628'; // COLOQUE O NÚMERO REAL AQUI
-            const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
-            
-            setTimeout(() => {
-                window.open(whatsappUrl, '_blank');
-            }, 1500);
+serviceCheckboxes.forEach(cb => {
+    cb.addEventListener("change", updateTotal);
+});
 
-            // Limpar formulário após 3 segundos
-            setTimeout(() => {
-                this.reset();
-                updateTotal();
-                document.getElementById('successMessage').style.display = 'none';
-            }, 3000);
+/* ================= AGENDAMENTO ================= */
+
+bookingForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const services = [...serviceCheckboxes]
+        .filter(cb => cb.checked)
+        .map(cb => ({
+            name: cb.dataset.name,
+            price: Number(cb.value)
+        }));
+
+    if (services.length === 0) {
+        alert("Selecione pelo menos um serviço");
+        return;
+    }
+
+    if (!timeSelect.value) {
+        alert("Escolha um horário");
+        return;
+    }
+
+    const body = {
+        name: document.getElementById("name").value,
+        phone: document.getElementById("phone").value,
+        date: dateInput.value,
+        time: timeSelect.value,
+        services,
+        total: totalAmount.textContent,
+        notes: document.getElementById("notes").value
+    };
+
+    try {
+        const res = await fetch("/api/bookings", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(body)
         });
-    </script>
-    <script>
-        (function () {
-            const weeklySchedule = {
-                0: [],
-                1: ['14:00', '15:30', '16:00', '17:30'],
-                2: ['08:00', '09:30', '10:00', '11:30', '14:00', '15:30', '16:00', '17:30'],
-                3: ['08:00', '09:30', '10:00', '11:30', '14:00', '15:30', '16:00', '17:30'],
-                4: ['08:00', '09:30', '10:00', '11:30', '14:00', '15:30', '16:00', '17:30'],
-                5: ['08:00', '09:30', '10:00', '11:30', '14:00', '15:30', '16:00', '17:30'],
-                6: ['08:00', '09:30', '10:00', '11:30', '12:30', '14:00', '15:30']
-            };
 
-            const weekdayNames = {
-                0: 'Domingo',
-                1: 'Segunda-feira',
-                2: 'Terca-feira',
-                3: 'Quarta-feira',
-                4: 'Quinta-feira',
-                5: 'Sexta-feira',
-                6: 'Sabado'
-            };
+        const data = await res.json();
 
-            const storageKey = 'jacy-sallys-bookings';
-            const bookingForm = document.getElementById('bookingForm');
-            const dateInput = document.getElementById('date');
-            const timeSelect = document.getElementById('time');
-            const availabilityMessage = document.getElementById('availabilityMessage');
-            const totalAmount = document.getElementById('totalAmount');
-            const successMessage = document.getElementById('successMessage');
-            const serviceCheckboxes = document.querySelectorAll('input[name="service"]');
+        if (res.status === 409) {
+            alert("Esse horário já foi reservado!");
+            loadAvailability(body.date);
+            return;
+        }
 
-            function getTodayAsInputValue() {
-                const today = new Date();
-                const year = today.getFullYear();
-                const month = String(today.getMonth() + 1).padStart(2, '0');
-                const day = String(today.getDate()).padStart(2, '0');
-                return `${year}-${month}-${day}`;
-            }
+        if (!res.ok) {
+            throw new Error(data.error);
+        }
 
-            function parseInputDate(value) {
-                const [year, month, day] = value.split('-').map(Number);
-                return new Date(year, month - 1, day);
-            }
+        successMessage.style.display = "block";
 
-            function formatDate(value) {
-                return parseInputDate(value).toLocaleDateString('pt-BR');
-            }
+        const msg =
+`🦋 *Novo Agendamento - Jacy Sallys* 🦋
 
-            function loadBookings() {
-                try {
-                    return JSON.parse(localStorage.getItem(storageKey)) || {};
-                } catch (error) {
-                    return {};
-                }
-            }
+👤 Nome: ${body.name}
+📅 Data: ${body.date}
+🕐 Horário: ${body.time}
 
-            function saveBookings(bookings) {
-                localStorage.setItem(storageKey, JSON.stringify(bookings));
-            }
+💅 Serviços:
+${services.map(s => "• " + s.name).join("\n")}
 
-            function getBookedTimes(dateValue) {
-                const bookings = loadBookings();
-                return bookings[dateValue] || [];
-            }
+💰 Total: ${body.total}`;
 
-            function reserveTime(dateValue, timeValue) {
-                const bookings = loadBookings();
-                const dayBookings = bookings[dateValue] || [];
+        window.open(
+            `https://wa.me/5575981754628?text=${encodeURIComponent(msg)}`,
+            "_blank"
+        );
 
-                if (!dayBookings.includes(timeValue)) {
-                    dayBookings.push(timeValue);
-                    dayBookings.sort((firstTime, secondTime) => firstTime.localeCompare(secondTime));
-                    bookings[dateValue] = dayBookings;
-                    saveBookings(bookings);
-                }
-            }
+        bookingForm.reset();
+        updateTotal();
+        loadAvailability(body.date);
 
-            function updateTotalValue() {
-                let total = 0;
+        setTimeout(() => {
+            successMessage.style.display = "none";
+        }, 3000);
 
-                serviceCheckboxes.forEach((checkbox) => {
-                    if (checkbox.checked) {
-                        total += Number(checkbox.value);
-                    }
-                });
+    } catch (err) {
+        alert("Erro ao salvar agendamento");
+    }
+});
 
-                totalAmount.textContent = `R$ ${total.toFixed(2).replace('.', ',')}`;
-            }
-
-            function renderTimeOptions() {
-                const selectedDate = dateInput.value;
-                timeSelect.innerHTML = '';
-
-                const defaultOption = document.createElement('option');
-                defaultOption.value = '';
-
-                if (!selectedDate) {
-                    defaultOption.textContent = 'Escolha primeiro uma data';
-                    timeSelect.appendChild(defaultOption);
-                    timeSelect.disabled = true;
-                    availabilityMessage.textContent = 'Escolha uma data para ver os horarios disponiveis.';
-                    return;
-                }
-
-                const weekday = parseInputDate(selectedDate).getDay();
-                const daySchedule = weeklySchedule[weekday] || [];
-                const bookedTimes = getBookedTimes(selectedDate);
-                const availableTimes = daySchedule.filter((timeValue) => !bookedTimes.includes(timeValue));
-
-                if (daySchedule.length === 0) {
-                    defaultOption.textContent = 'Nao ha atendimento neste dia';
-                    timeSelect.appendChild(defaultOption);
-                    timeSelect.disabled = true;
-                    availabilityMessage.textContent = `${weekdayNames[weekday]} nao possui horarios de atendimento.`;
-                    return;
-                }
-
-                if (availableTimes.length === 0) {
-                    defaultOption.textContent = 'Sem horarios disponiveis';
-                    timeSelect.appendChild(defaultOption);
-                    timeSelect.disabled = true;
-                    availabilityMessage.textContent = `Todos os horarios de ${weekdayNames[weekday]} em ${formatDate(selectedDate)} ja foram reservados.`;
-                    return;
-                }
-
-                defaultOption.textContent = 'Selecione um horario';
-                timeSelect.appendChild(defaultOption);
-
-                availableTimes.forEach((timeValue) => {
-                    const option = document.createElement('option');
-                    option.value = timeValue;
-                    option.textContent = timeValue;
-                    timeSelect.appendChild(option);
-                });
-
-                timeSelect.disabled = false;
-                availabilityMessage.textContent = `${weekdayNames[weekday]} com ${availableTimes.length} horario(s) disponivel(is).`;
-            }
-
-            dateInput.min = getTodayAsInputValue();
-
-            serviceCheckboxes.forEach((checkbox) => {
-                checkbox.addEventListener('change', updateTotalValue);
-            });
-
-            dateInput.addEventListener('change', renderTimeOptions);
-            window.addEventListener('storage', renderTimeOptions);
-
-            bookingForm.addEventListener('submit', (event) => {
-                event.preventDefault();
-                event.stopImmediatePropagation();
-
-                const name = document.getElementById('name').value.trim();
-                const phone = document.getElementById('phone').value.trim();
-                const dateValue = dateInput.value;
-                const timeValue = timeSelect.value;
-                const notes = document.getElementById('notes').value.trim();
-                const selectedServices = [];
-
-                serviceCheckboxes.forEach((checkbox) => {
-                    if (checkbox.checked) {
-                        selectedServices.push(checkbox.dataset.name);
-                    }
-                });
-
-                if (!dateValue || !timeValue) {
-                    alert('Escolha uma data e um horario disponivel para continuar.');
-                    return;
-                }
-
-                if (selectedServices.length === 0) {
-                    alert('Selecione pelo menos um servico.');
-                    return;
-                }
-
-                if (getBookedTimes(dateValue).includes(timeValue)) {
-                    alert('Esse horario acabou de ser reservado. Escolha outro horario disponivel.');
-                    renderTimeOptions();
-                    return;
-                }
-
-                reserveTime(dateValue, timeValue);
-                renderTimeOptions();
-
-                const formattedDate = formatDate(dateValue);
-                const total = totalAmount.textContent;
-                let message = '*Novo agendamento - Jacy Sallys*\n\n';
-                message += `*Nome:* ${name}\n`;
-                message += `*Telefone:* ${phone}\n`;
-                message += `*Data:* ${formattedDate}\n`;
-                message += `*Horario:* ${timeValue}\n\n`;
-                message += '*Servicos:*\n';
-
-                selectedServices.forEach((serviceName) => {
-                    message += `- ${serviceName}\n`;
-                });
-
-                message += `\n*Total:* ${total}`;
-
-                if (notes) {
-                    message += `\n\n*Observacoes:* ${notes}`;
-                }
-
-                successMessage.textContent = 'Agendamento registrado com sucesso. O horario escolhido foi removido da lista de disponibilidade.';
-                successMessage.style.display = 'block';
-
-                const whatsappNumber = '5575981754628';
-                const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
-                window.open(whatsappUrl, '_blank');
-
-                setTimeout(() => {
-                    bookingForm.reset();
-                    updateTotalValue();
-                    renderTimeOptions();
-                    successMessage.style.display = 'none';
-                }, 3000);
-            }, true);
-
-            updateTotalValue();
-            renderTimeOptions();
-        }());
-    </script>
-</body>
-</html>
+/* INIT */
+updateTotal();
+</script>
