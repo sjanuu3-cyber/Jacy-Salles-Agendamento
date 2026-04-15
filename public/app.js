@@ -23,16 +23,6 @@ const STATUS_LABELS = {
 };
 
 const WHATSAPP_NUMBER = "5575981754628";
-const WHATSAPP_EMOJIS = {
-    butterfly: "\u{1F98B}",
-    person: "\u{1F464}",
-    phone: "\u{1F4F1}",
-    date: "\u{1F4C5}",
-    time: "\u{1F550}",
-    services: "\u{1F485}",
-    total: "\u{1F4B0}",
-    notes: "\u{1F4DD}"
-};
 
 let adminAuthenticated = false;
 
@@ -87,20 +77,20 @@ function updateTotal() {
 function buildWhatsAppMessage(body) {
     const servicesText = body.services.map(service => `* ${service.name}`).join("\n");
 
-    let message = `${WHATSAPP_EMOJIS.butterfly} *Novo agendamento - Jacy Sallys* ${WHATSAPP_EMOJIS.butterfly}
+    let message = `*Novo agendamento - Jacy Sallys*
 
-${WHATSAPP_EMOJIS.person} Nome: ${body.name}
-${WHATSAPP_EMOJIS.phone} Telefone: ${body.phone}
-${WHATSAPP_EMOJIS.date} Data: ${formatDateBR(body.date)}
-${WHATSAPP_EMOJIS.time} Horario: ${body.time}
+Nome: ${body.name}
+Telefone: ${body.phone}
+Data: ${formatDateBR(body.date)}
+Horario: ${body.time}
 
-${WHATSAPP_EMOJIS.services} Servicos:
+Servicos:
 ${servicesText}
 
-${WHATSAPP_EMOJIS.total} Total: ${body.total}`;
+Total: ${body.total}`;
 
     if (body.notes) {
-        message += `\n\n${WHATSAPP_EMOJIS.notes} Observacoes:\n${body.notes}`;
+        message += `\n\nObservacoes:\n${body.notes}`;
     }
 
     return message;
