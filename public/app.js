@@ -23,6 +23,16 @@ const STATUS_LABELS = {
 };
 
 const WHATSAPP_NUMBER = "5575981754628";
+const WHATSAPP_EMOJIS = {
+    butterfly: "\u{1F98B}",
+    person: "\u{1F464}",
+    phone: "\u{1F4F1}",
+    date: "\u{1F4C5}",
+    time: "\u{1F550}",
+    services: "\u{1F485}",
+    total: "\u{1F4B0}",
+    notes: "\u{1F4DD}"
+};
 
 let adminAuthenticated = false;
 
@@ -77,23 +87,92 @@ function updateTotal() {
 function buildWhatsAppMessage(body) {
     const servicesText = body.services.map(service => `* ${service.name}`).join("\n");
 
-    let message = `🦋 *Novo agendamento - Jacy Sallys* 🦋
+    let message = `${WHATSAPP_EMOJIS.butterfly} *Novo agendamento - Jacy Sallys* ${WHATSAPP_EMOJIS.butterfly}
 
-👤 Nome: ${body.name}
-📱 Telefone: ${body.phone}
-📅 Data: ${formatDateBR(body.date)}
-🕐 Horario: ${body.time}
+${WHATSAPP_EMOJIS.person} Nome: ${body.name}
+${WHATSAPP_EMOJIS.phone} Telefone: ${body.phone}
+${WHATSAPP_EMOJIS.date} Data: ${formatDateBR(body.date)}
+${WHATSAPP_EMOJIS.time} Horario: ${body.time}
 
-💅 Servicos:
+${WHATSAPP_EMOJIS.services} Servicos:
 ${servicesText}
 
-💰 Total: ${body.total}`;
+${WHATSAPP_EMOJIS.total} Total: ${body.total}`;
 
     if (body.notes) {
-        message += `\n\n📝 Observacoes:\n${body.notes}`;
+        message += `\n\n${WHATSAPP_EMOJIS.notes} Observacoes:\n${body.notes}`;
     }
 
     return message;
+}
+
+function prepareWhatsAppWindow(whatsappWindow) {
+    if (!whatsappWindow || whatsappWindow.closed) {
+        return;
+    }
+
+    try {
+        whatsappWindow.document.write(`<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Abrindo WhatsApp...</title>
+</head>
+<body style="margin:0;font-family:Arial,sans-serif;background:#f6efe9;color:#5f3f37;display:grid;place-items:center;min-height:100vh;">
+    <div style="text-align:center;padding:32px;">
+        <p style="font-size:18px;font-weight:bold;margin:0 0 12px;">Abrindo WhatsApp...</p>
+        <p style="margin:0;">Estamos preparando a mensagem do agendamento.</p>
+    </div>
+</body>
+</html>`);
+        whatsappWindow.document.close();
+    } catch {
+        // Ignore cross-origin or popup rendering issues.
+    }
+}
+
+function openWhatsApp(whatsappMessage, whatsappWindow) {
+    const encodedMessage = encodeURIComponent(whatsappMessage);
+    const appUrl = `whatsapp://send?phone=${WHATSAPP_NUMBER}&text=${encodedMessage}`;
+    const webUrl = `https://api.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${encodedMessage}`;
+
+    let fallbackTimer = null;
+
+    const cancelFallback = () => {
+        if (fallbackTimer) {
+            clearTimeout(fallbackTimer);
+            fallbackTimer = null;
+        }
+
+        window.removeEventListener("blur", cancelFallback);
+        document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+
+    const handleVisibilityChange = () => {
+        if (document.hidden) {
+            cancelFallback();
+        }
+    };
+
+    window.addEventListener("blur", cancelFallback, { once: true });
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    fallbackTimer = setTimeout(() => {
+        if (whatsappWindow && !whatsappWindow.closed) {
+            whatsappWindow.location.replace(webUrl);
+        } else {
+            window.location.href = webUrl;
+        }
+
+        cancelFallback();
+    }, 1200);
+
+    if (whatsappWindow && !whatsappWindow.closed) {
+        whatsappWindow.location.replace(appUrl);
+        return;
+    }
+
+    window.location.href = appUrl;
 }
 
 function setAdminState(authenticated) {
@@ -393,6 +472,8 @@ async function handleBookingSubmit(event) {
 
     const whatsappWindow = window.open("", "_blank");
 
+    prepareWhatsAppWindow(whatsappWindow);
+
     try {
         const response = await fetch("/api/bookings", {
             method: "POST",
@@ -419,13 +500,7 @@ async function handleBookingSubmit(event) {
         }
 
         const whatsappMessage = buildWhatsAppMessage(body);
-        const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(whatsappMessage)}`;
-
-        if (whatsappWindow) {
-            whatsappWindow.location.href = whatsappUrl;
-        } else {
-            window.location.href = whatsappUrl;
-        }
+        openWhatsApp(whatsappMessage, whatsappWindow);
 
         showBookingFeedback("Agendamento salvo com sucesso. A mensagem do WhatsApp foi preparada.");
         bookingForm.reset();
