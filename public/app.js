@@ -134,7 +134,19 @@ function prepareWhatsAppWindow(whatsappWindow) {
 function openWhatsApp(whatsappMessage, whatsappWindow) {
     const encodedMessage = encodeURIComponent(whatsappMessage);
     const appUrl = `whatsapp://send?phone=${WHATSAPP_NUMBER}&text=${encodedMessage}`;
-    const webUrl = `https://api.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${encodedMessage}`;
+    const mobileWebUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodedMessage}`;
+    const desktopWebUrl = `https://web.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${encodedMessage}`;
+    const isMobileDevice = /Android|iPhone|iPad|iPod|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+    if (!isMobileDevice) {
+        if (whatsappWindow && !whatsappWindow.closed) {
+            whatsappWindow.location.replace(desktopWebUrl);
+        } else {
+            window.open(desktopWebUrl, "_blank");
+        }
+
+        return;
+    }
 
     let fallbackTimer = null;
 
@@ -159,9 +171,9 @@ function openWhatsApp(whatsappMessage, whatsappWindow) {
 
     fallbackTimer = setTimeout(() => {
         if (whatsappWindow && !whatsappWindow.closed) {
-            whatsappWindow.location.replace(webUrl);
+            whatsappWindow.location.replace(mobileWebUrl);
         } else {
-            window.location.href = webUrl;
+            window.location.href = mobileWebUrl;
         }
 
         cancelFallback();
